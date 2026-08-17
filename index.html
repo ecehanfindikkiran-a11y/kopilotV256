@@ -51,26 +51,29 @@
 
         /* YAN PANEL (SIDEBAR / DRAWER) */
         .sidebar-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index: 2000; }
-        .sidebar { position: fixed; top:0; left:-300px; width:260px; height:100%; background: var(--card-color); box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 2001; transition: left 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar { position: fixed; top:0; left:-320px; width:280px; height:100%; background: var(--card-color); box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 2001; transition: left 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .sidebar.open { left: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--form-bg); padding-bottom: 10px; }
         .sidebar-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .menu-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; background: var(--form-bg); color: var(--text-color); border: none; font-weight: bold; cursor: pointer; text-align: left; font-size: 14px; transition: 0.2s; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; background: var(--form-bg); color: var(--text-color); border: none; font-weight: bold; cursor: pointer; text-align: left; font-size: 13px; transition: 0.2s; }
         .menu-item:hover, .menu-item.active { background: var(--accent); color: white; }
 
         /* SEKMELER / SAYFALAR */
         .page-section { display: none; }
         .page-section.active { display: block; }
 
-        /* ÖZEL ÇALIŞMA SAYACI */
-        .timer-container { text-align: center; padding: 30px; background: var(--form-bg); border-radius: 12px; }
-        .timer-clock { font-size: 48px; font-weight: bold; color: var(--accent); margin: 20px 0; }
-        .timer-controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .btn-timer-action { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* KART DÜZENLERİ */
+        .feature-card { background: var(--form-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .feature-card h3 { color: var(--accent); margin-top: 0; }
+
+        /* SAYAÇ & KRONOMETRE */
+        .timer-container { text-align: center; padding: 20px; background: var(--form-bg); border-radius: 12px; }
+        .timer-clock { font-size: 42px; font-weight: bold; color: var(--accent); margin: 15px 0; }
+        .btn-timer-action { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         /* FORM VE TAHTA STİLLERİ */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; background: var(--form-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        select, input { padding: 10px; border: 1px solid #ffd8d8; border-radius: 8px; font-size: 13px; outline: none; background: var(--card-color); color: var(--text-color); }
+        select, input, textarea { padding: 10px; border: 1px solid #ffd8d8; border-radius: 8px; font-size: 13px; outline: none; background: var(--card-color); color: var(--text-color); }
         
         .days-checkboxes { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; background: var(--card-color); padding: 10px; border-radius: 8px; border: 1px solid #ffe1e1; align-items: center; }
         .days-checkboxes label { font-size: 13px; font-weight: 600; color: #555; cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -114,10 +117,15 @@
     </div>
     <div class="sidebar-menu">
         <button class="menu-item active" onclick="sayfaDegistir('anaSayfa')">🏠 Programım & Tahta</button>
+        <button class="menu-item" onclick="sayfaDegistir('yksHedefSayfasi')">🎯 YKS 2027 & Hedefler</button>
         <button class="menu-item" onclick="sayfaDegistir('sayacSayfasi')">⏱️ Çalışma Sayacı</button>
+        <button class="menu-item" onclick="sayfaDegistir('skorSayfasi')">🏆 Tatlı Yarış Panosu</button>
+        <button class="menu-item" onclick="sayfaDegistir('netSayfasi')">📚 Deneme Net Takibi</button>
+        <button class="menu-item" onclick="sayfaDegistir('muzikSayfasi')">🎵 Odaklanma Sesleri</button>
+        <button class="menu-item" onclick="sayfaDegistir('soruSayfasi')">❓ Zor Sorular Defteri</button>
         <button class="menu-item" onclick="sayfaDegistir('notlarSayfasi')">💌 Motivasyon Notları</button>
-        <button class="menu-item" onclick="toggleDarkMode()">🌙 Gece Modu Aç/Kapat</button>
-        <button class="menu-item" onclick="toggleFullScreen()">⛶ Tam Ekran Yap</button>
+        <button class="menu-item" onclick="toggleDarkMode()">🌙 Gece Modu</button>
+        <button class="menu-item" onclick="toggleFullScreen()">⛶ Tam Ekran</button>
     </div>
 </div>
 
@@ -182,21 +190,35 @@
         <div class="weekly-board" id="haftalikTahta"></div>
     </div>
 
-    <!-- 2. SEKME: ÖZEL ÇALIŞMA SAYACI -->
+    <!-- 2. SEKME: YKS 2027 & HEDEFLER -->
+    <div id="yksHedefSayfasi" class="page-section">
+        <div class="feature-card" style="text-align: center;">
+            <h3>🎯 YKS 2027 Geri Sayım</h3>
+            <div id="yksCountdown" style="font-size: 32px; font-weight: bold; color: var(--accent); margin: 15px 0;">0 Gün 0 Saat 0 Dk</div>
+            <p style="color: #666; font-size: 13px;">Geleceğin burada şekilleniyor, pes etmek yok!</p>
+        </div>
+        <div class="feature-card">
+            <h3>🎓 Üniversite & Bölüm Hedeflerimiz</h3>
+            <div style="background: var(--card-color); padding: 15px; border-radius: 8px; border-left: 5px solid var(--accent); margin-bottom: 10px;">
+                <b style="color: var(--accent);">👑 Senin Hedefin:</b> Tıp Fakültesi / Semmelweis University 🩺✨
+            </div>
+            <div style="background: var(--card-color); padding: 15px; border-radius: 8px; border-left: 5px solid #3498db;">
+                <b style="color: #3498db;">🤍 Sevgilinin Hedefi:</b> Üniversite Hedefi & Hayaller 🎓🚀
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SEKME: ÖZEL ÇALIŞMA SAYACI -->
     <div id="sayacSayfasi" class="page-section">
         <div class="timer-container">
             <h3>⏱️ Odaklanma Sayacı (Pomodoro)</h3>
-            <p>Çalışma süreni ayarla ve odaklanmaya başla!</p>
-            
             <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold;">Çalışma Süresi (Dakika): </label>
-                <input type="number" id="customTimerInput" value="25" min="1" max="180" style="width: 70px; text-align: center;">
-                <button class="btn-timer-action" onclick="setCustomTimer()">Süreyi Ayarla</button>
+                <label style="font-weight: bold;">Çalışma Süresi (Dk): </label>
+                <input type="number" id="customTimerInput" value="25" min="1" max="180" style="width: 60px; text-align: center;">
+                <button class="btn-timer-action" onclick="setCustomTimer()">Ayarla</button>
             </div>
-
             <div class="timer-clock" id="timerClockDisplay">25:00</div>
-
-            <div class="timer-controls">
+            <div style="display:flex; justify-content:center; gap:10px;">
                 <button class="btn-timer-action" onclick="startCustomTimer()">▶️ Başlat</button>
                 <button class="btn-timer-action" style="background:#e74c3c;" onclick="pauseCustomTimer()">⏸️ Durdur</button>
                 <button class="btn-timer-action" style="background:#7f8c8d;" onclick="resetCustomTimer()">🔄 Sıfırla</button>
@@ -204,14 +226,72 @@
         </div>
     </div>
 
-    <!-- 3. SEKME: MOTİVASYON NOTLARI -->
+    <!-- 4. SEKME: TATLI YARIŞ PANOSU -->
+    <div id="skorSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>🏆 Haftalık Başarı Kıyaslaması</h3>
+            <p>Bu haftaki ders tamamlama oranlarınız:</p>
+            <div style="margin-bottom: 15px;">
+                <b>👑 Sen: <span id="skorBen">%0</span></b>
+                <div style="background:#ddd; border-radius:10px; height:15px; overflow:hidden;">
+                    <div id="barBen" style="background:var(--accent); width:0%; height:100%; transition:0.5s;"></div>
+                </div>
+            </div>
+            <div>
+                <b>🤍 Sevgilin: <span id="skorSevgili">%0</span></b>
+                <div style="background:#ddd; border-radius:10px; height:15px; overflow:hidden;">
+                    <div id="barSevgili" style="background:#3498db; width:0%; height:100%; transition:0.5s;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. SEKME: DENEME NET TAKİBİ -->
+    <div id="netSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>📚 Deneme Net Kaydı</h3>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:10px; margin-bottom:10px;">
+                <select id="netTür"><option>TYT</option><option>AYT</option></select>
+                <input type="number" id="netTurkce" placeholder="Türkçe/Edeb">
+                <input type="number" id="netMat" placeholder="Matematik">
+                <input type="number" id="netSos" placeholder="Sosyal">
+                <input type="number" id="netFen" placeholder="Fen">
+            </div>
+            <button class="btn-add" onclick="netEkle()">Neti Kaydet 📝</button>
+            <div id="netListesi" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+    </div>
+
+    <!-- 6. SEKME: ODAKLANMA SESLERİ -->
+    <div id="muzikSayfasi" class="page-section">
+        <div class="feature-card" style="text-align:center;">
+            <h3>🎵 Arkaplan Çalışma Sesleri</h3>
+            <p>Ders çalışırken odaklanmana yardımcı olacak playlistler:</p>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+                <a href="https://www.youtube.com/watch?v=jfKfPfyJRdk" target="_blank" class="btn-timer-action" style="text-decoration:none;">🎧 Lo-Fi Study Music</a>
+                <a href="https://www.youtube.com/watch?v=mPZkdNF6084" target="_blank" class="btn-timer-action" style="background:#34495e; text-decoration:none;">🌧️ Yağmur Sesi</a>
+                <a href="https://www.youtube.com/watch?v=4vIQON2fDWM" target="_blank" class="btn-timer-action" style="background:#e67e22; text-decoration:none;">📖 Kütüphane Sesi</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. SEKME: ZOR SORULAR DEFTERİ -->
+    <div id="soruSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>❓ Yapılamayan Sorular & Notlar</h3>
+            <input type="text" id="soruDers" placeholder="Ders & Konu (ör: Mat - Permütasyon)" style="width:95%; margin-bottom:10px;">
+            <textarea id="soruNot" placeholder="Soru mantığını veya çözüm yolunu yaz..." style="width:95%; height:60px; margin-bottom:10px;"></textarea>
+            <button class="btn-add" onclick="soruEkle()">Soru Notunu Ekle 📌</button>
+            <div id="soruListesi" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+    </div>
+
+    <!-- 8. SEKME: MOTİVASYON NOTLARI -->
     <div id="notlarSayfasi" class="page-section">
-        <div style="background: var(--form-bg); padding: 20px; border-radius: 12px; text-align: center;">
+        <div class="feature-card" style="text-align: center;">
             <h3>💌 Canlı Motivasyon Notları</h3>
-            <p>Sevgiline veya kendine günün mesajını bırak!</p>
-            <textarea id="notInput" placeholder="Mesajını yaz aşkım..." style="width: 90%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ffd8d8; outline: none;"></textarea><br><br>
-            <button class="btn-add" style="width: auto; padding: 10px 30px;" onclick="notGonder()">Mesajı Gönder 🌸</button>
-            
+            <textarea id="notInput" placeholder="Mesajını yaz aşkım..." style="width: 90%; height: 70px; margin-bottom: 10px;"></textarea><br>
+            <button class="btn-add" style="width: auto; padding: 8px 25px;" onclick="notGonder()">Mesajı Gönder 🌸</button>
             <div id="notlarListesi" style="margin-top: 20px; text-align: left; display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
     </div>
@@ -265,6 +345,7 @@ function sayfaDegistir(sayfaId) {
     document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
     document.getElementById(sayfaId).classList.add('active');
     toggleSidebar();
+    if(sayfaId === 'skorSayfasi') skorGuncelle();
 }
 
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
@@ -272,6 +353,22 @@ function toggleFullScreen() {
     if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => {}); }
     else { document.exitFullscreen().catch(() => {}); }
 }
+
+// YKS GERİ SAYIM
+function updateYksTimer() {
+    const yksDate = new Date('June 20, 2027 10:00:00').getTime();
+    const now = new Date().getTime();
+    const diff = yksDate - now;
+
+    if(diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('yksCountdown').innerText = `${days} Gün ${hours} Saat ${mins} Dk`;
+    }
+}
+setInterval(updateYksTimer, 1000);
+updateYksTimer();
 
 // ÖZEL SAYAÇ MANTIĞI
 let customTimerInterval = null;
@@ -305,15 +402,79 @@ function startCustomTimer() {
     }, 1000);
 }
 
-function pauseCustomTimer() {
-    clearInterval(customTimerInterval);
-    isCustomTimerRunning = false;
+function pauseCustomTimer() { clearInterval(customTimerInterval); isCustomTimerRunning = false; }
+function resetCustomTimer() { pauseCustomTimer(); setCustomTimer(); }
+
+// SKOR KIYASLAMA
+function skorGuncelle() {
+    db.ref('programlar').once('value', (snap) => {
+        const data = snap.val() || {};
+        ['ben', 'sevgili'].forEach(p => {
+            const pData = data[p] || [];
+            let tot = 0, comp = 0;
+            pData.forEach(i => { tot += i.toplam; comp += (i.tamamlanan || 0); });
+            const pct = tot > 0 ? Math.round((comp / tot) * 100) : 0;
+            if(p === 'ben') {
+                document.getElementById('skorBen').innerText = `%${pct}`;
+                document.getElementById('barBen').style.width = `${pct}%`;
+            } else {
+                document.getElementById('skorSevgili').innerText = `%${pct}`;
+                document.getElementById('barSevgili').style.width = `${pct}%`;
+            }
+        });
+    });
 }
 
-function resetCustomTimer() {
-    pauseCustomTimer();
-    setCustomTimer();
+// DENEME NETLERİ
+function netEkle() {
+    const tur = document.getElementById('netTür').value;
+    const turkce = parseFloat(document.getElementById('netTurkce').value) || 0;
+    const mat = parseFloat(document.getElementById('netMat').value) || 0;
+    const sos = parseFloat(document.getElementById('netSos').value) || 0;
+    const fen = parseFloat(document.getElementById('netFen').value) || 0;
+    const toplam = turkce + mat + sos + fen;
+
+    db.ref('netler/' + aktifProfil).push({ tur, turkce, mat, sos, fen, toplam, tarih: new Date().toLocaleDateString() });
 }
+
+db.ref('netler/' + aktifProfil).on('value', (snap) => {
+    const list = document.getElementById('netListesi');
+    list.innerHTML = '';
+    const data = snap.val();
+    if(data) {
+        Object.keys(data).reverse().forEach(k => {
+            const i = data[k];
+            list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid var(--accent);">
+                <b>${i.tur} (${i.tarih})</b> - Toplam Net: <b style="color:var(--accent);">${i.toplam}</b><br>
+                <small>Tr/Ed: ${i.turkce} | Mat: ${i.mat} | Sos: ${i.sos} | Fen: ${i.fen}</small>
+            </div>`;
+        });
+    }
+});
+
+// ZOR SORULAR
+function soruEkle() {
+    const ders = document.getElementById('soruDers').value;
+    const not = document.getElementById('soruNot').value;
+    if(!ders || !not) return;
+    db.ref('sorular/' + aktifProfil).push({ ders, not });
+    document.getElementById('soruDers').value = '';
+    document.getElementById('soruNot').value = '';
+}
+
+db.ref('sorular/' + aktifProfil).on('value', (snap) => {
+    const list = document.getElementById('soruListesi');
+    list.innerHTML = '';
+    const data = snap.val();
+    if(data) {
+        Object.keys(data).reverse().forEach(k => {
+            const i = data[k];
+            list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid #e67e22;">
+                <b>${i.ders}</b><br><span>${i.not}</span>
+            </div>`;
+        });
+    }
+});
 
 // MOTİVASYON NOTLARI
 function notGonder() {
@@ -327,22 +488,19 @@ function notGonder() {
     document.getElementById('notInput').value = '';
 }
 
-function liveListenNotes() {
-    db.ref('notlar').on('value', (snap) => {
-        const data = snap.val();
-        const list = document.getElementById('notlarListesi');
-        list.innerHTML = '';
-        if(data) {
-            Object.keys(data).reverse().forEach(key => {
-                const item = data[key];
-                list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid var(--accent);">
-                    <b>${item.yazan}</b> <span style="font-size:10px; color:#888;">(${item.tarih})</span><br>${item.mesaj}
-                </div>`;
-            });
-        }
-    });
-}
-liveListenNotes();
+db.ref('notlar').on('value', (snap) => {
+    const list = document.getElementById('notlarListesi');
+    list.innerHTML = '';
+    const data = snap.val();
+    if(data) {
+        Object.keys(data).reverse().forEach(key => {
+            const item = data[key];
+            list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid var(--accent);">
+                <b>${item.yazan}</b> <span style="font-size:10px; color:#888;">(${item.tarih})</span><br>${item.mesaj}
+            </div>`;
+        });
+    }
+});
 
 // CANLI PROGRAM DİNLEYİCİ
 function liveListen() {
