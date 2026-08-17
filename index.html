@@ -3,242 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Kopilot Super App</title>
-    
-    <!-- Firebase -->
+    <title>Kopilot App</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --bg: #fdf6f0;
-            --card-bg: #ffffff;
-            --text: #2d3436;
-            --accent: #ff6b81;
-            --border: #ffeaa7;
-            --column-bg: #f8efba;
-        }
-
-        body.dark-mode {
-            --bg: #1e272e;
-            --card-bg: #2f3640;
-            --text: #f5f6fa;
-            --accent: #ff7675;
-            --border: #485460;
-            --column-bg: #3d3d3d;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            transition: all 0.3s ease;
-            margin: 0;
-            padding: 15px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .profile-switch {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .profile-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid var(--accent);
-            background: transparent;
-            color: var(--text);
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .profile-btn.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .action-btns {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-round {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .timer-box {
-            background: var(--accent);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        /* Form Alanı */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            padding: 15px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            background: var(--bg);
-        }
-
-        input, select {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--card-bg);
-            color: var(--text);
-            outline: none;
-        }
-
-        .btn-add {
-            grid-column: 1 / -1;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Haftalık Tahta */
-        .weekly-board {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-        }
-
-        .day-column {
-            background: var(--column-bg);
-            border-radius: 10px;
-            padding: 10px;
-            min-height: 200px;
-        }
-
-        .day-column h4 {
-            margin: 0 0 10px 0;
-            text-align: center;
-        }
-
-        .task-card {
-            background: var(--card-bg);
-            border-left: 4px solid var(--accent);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            position: relative;
-            font-size: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            word-break: break-word;
-        }
-
-        .task-card.completed {
-            opacity: 0.5;
-            text-decoration: line-through;
-        }
-
-        .yt-link-btn {
-            display: inline-block;
-            margin-top: 6px;
-            color: #ff4757;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 11px;
-        }
-
-        .card-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .btn-card {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        :root { --bg: #fdf6f0; --card: #ffffff; --text: #333; --accent: #ff6b81; }
+        .dark-mode { --bg: #1e272e; --card: #2f3640; --text: #f5f6fa; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .profile-btn { padding: 10px 20px; border: 2px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .profile-btn.active { background: var(--accent); color: white; }
+        .action-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mini-btn { background: #eee; border: none; padding: 10px; border-radius: 50%; cursor: pointer; }
+        .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
+        .btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .col { background: #fce8e8; padding: 15px; border-radius: 10px; }
+        .task { background: var(--card); padding: 10px; border-radius: 5px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .yt-link { color: red; font-size: 12px; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>🌸 Kopilot App</h2>
-        <div class="action-btns">
-            <button class="btn-round" id="darkBtn" onclick="toggleDarkMode()">🌙 Gece</button>
-            <button class="btn-round" onclick="toggleFullScreen()">⛶ Ekran</button>
-            <div class="timer-box" onclick="toggleTimer()" id="timerDisplay">⏱️ 25:00 (Başlat)</div>
-        </div>
+<div class="header">
+    <h2>🌸 Kopilot App</h2>
+    <div>
+        <button class="profile-btn active" id="btnBen" onclick="profilDegistir('ben')">Ben</button>
+        <button class="profile-btn" id="btnSevgili" onclick="profilDegistir('sevgili')">Sevgilim</button>
     </div>
-
-    <!-- Profil Seçimi -->
-    <div class="profile-switch">
-        <button class="profile-btn active" id="btnBen" onclick="profilDegistir('ben')">👑 Benim Programım</button>
-        <button class="profile-btn" id="btnSevgili" onclick="profilDegistir('sevgili')">🤍 Sevgilimin Programı</button>
-    </div>
-
-    <div class="form-grid">
-        <select id="gun">
-            <option value="Pazartesi">Pazartesi</option>
-            <option value="Salı">Salı</option>
-            <option value="Çarşamba">Çarşamba</option>
-            <option value="Perşembe">Perşembe</option>
-            <option value="Cuma">Cuma</option>
-            <option value="Cumartesi">Cumartesi</option>
-            <option value="Pazar">Pazar</option>
-        </select>
-        <select id="kategori">
-            <option value="Soru Bankası">📚 Soru Bankası</option>
-            <option value="YouTube Kampı">▶️ YouTube Kampı</option>
-        </select>
-        <input type="text" id="ders" placeholder="Ders">
-        <input type="text" id="kaynak" placeholder="Kaynak/Konu">
-        <input type="text" id="ytUrl" placeholder="YouTube Linki (Opsiyonel)">
-        <button class="btn-add" onclick="gorevEkle()">Programa Ekle</button>
-    </div>
-
-    <div class="weekly-board" id="haftalikTahta"></div>
 </div>
 
+<div class="action-box">
+    <button class="mini-btn" onclick="toggleDarkMode()">🌙</button>
+    <button class="mini-btn" onclick="toggleFullScreen()">⛶</button>
+    <button class="mini-btn" onclick="toggleTimer()" id="timerDisplay">⏱️</button>
+</div>
+
+<div class="input-box">
+    <input type="text" id="ders" placeholder="Ders">
+    <input type="text" id="kaynak" placeholder="Kaynak">
+    <input type="text" id="ytUrl" placeholder="YouTube Linki">
+    <button class="btn-add" onclick="gorevEkle()">Ekle</button>
+</div>
+
+<div class="board" id="tahta"></div>
+
 <script>
-// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyChfFEva4PkZ48zy9rAkWJV7Z_W-5o6BFE",
   databaseURL: "https://kopilot-v16-default-rtdb.firebaseio.com",
@@ -249,153 +61,41 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
 let aktifProfil = 'ben';
 
-// PROFİL DEĞİŞTİRME
-function profilDegistir(profil) {
-    aktifProfil = profil;
-    document.getElementById('btnBen').classList.toggle('active', profil === 'ben');
-    document.getElementById('btnSevgili').classList.toggle('active', profil === 'sevgili');
-    verileriYukle();
-}
+function profilDegistir(p) { aktifProfil = p; document.getElementById('btnBen').classList.toggle('active', p==='ben'); document.getElementById('btnSevgili').classList.toggle('active', p==='sevgili'); verileriYukle(); }
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+function toggleFullScreen() { !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen(); }
+let timerRunning = false;
+function toggleTimer() { timerRunning = !timerRunning; alert(timerRunning ? "Sayaç Başladı!" : "Sayaç Durdu!"); }
 
-// GECE MODU
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const btn = document.getElementById('darkBtn');
-    btn.innerText = document.body.classList.contains('dark-mode') ? '☀️ Gündüz' : '🌙 Gece';
-}
-
-// TAM EKRAN
-function toggleFullScreen() {
-    let doc = window.document;
-    let docEl = doc.documentElement;
-    let requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullScreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-    let cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
-
-    if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-        requestFullScreen.call(docEl);
-    } else {
-        cancelFullScreen.call(doc);
-    }
-}
-
-// POMODORO TIMER
-let timerInterval = null;
-let timeLeft = 25 * 60;
-let isTimerRunning = false;
-
-function updateTimerDisplay() {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    if (seconds < 10) seconds = '0' + seconds;
-    if (minutes < 10) minutes = '0' + minutes;
-    
-    const display = document.getElementById('timerDisplay');
-    display.innerText = isTimerRunning ? `⏱️ ${minutes}:${seconds} (Durdur)` : `⏱️ ${minutes}:${seconds} (Başlat)`;
-}
-
-function toggleTimer() {
-    if (isTimerRunning) {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-    } else {
-        isTimerRunning = true;
-        timerInterval = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateTimerDisplay();
-            } else {
-                clearInterval(timerInterval);
-                isTimerRunning = false;
-                alert("Süre bitti aşkım! Mola zamanı 🎉");
-                timeLeft = 25 * 60;
-                updateTimerDisplay();
-            }
-        }, 1000);
-    }
-    updateTimerDisplay();
-}
-
-// TAHTAYI ÇİZME
-function tahtayiCiz(data) {
-    const tahta = document.getElementById('haftalikTahta');
-    tahta.innerHTML = '';
-    const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
-    
-    gunler.forEach(gun => {
-        let html = `<div class="day-column"><h4>${gun}</h4>`;
-        
-        if (data) {
-            Object.keys(data).forEach(key => {
-                const item = data[key];
-                if (item.gun === gun) {
-                    html += `
-                        <div class="task-card ${item.tamamlandi ? 'completed' : ''}">
-                            <span style="font-size:10px; color:#888;">${item.kategori || ''}</span><br>
-                            <b>${item.ders}</b><br>
-                            <span>${item.kaynak}</span><br>
-                            ${item.ytUrl ? `<a href="${item.ytUrl}" target="_blank" class="yt-link-btn">▶️ Videoya Git</a><br>` : ''}
-                            <div class="card-actions">
-                                <button class="btn-card" onclick="durumDegistir('${key}', ${!item.tamamlandi})">${item.tamamlandi ? '↩️' : '✅'}</button>
-                                <button class="btn-card" onclick="gorevSil('${key}')">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        }
-        
-        html += `</div>`;
-        tahta.innerHTML += html;
-    });
-}
-
-// GÖREV EKLEME
-function gorevEkle() {
-    const ders = document.getElementById('ders').value;
-    const kaynak = document.getElementById('kaynak').value;
-    
-    if(!ders || !kaynak) {
-        alert("Lütfen ders ve kaynak kısımlarını doldur aşkım!");
-        return;
-    }
-
-    const yeniGorev = {
-        gun: document.getElementById('gun').value,
-        kategori: document.getElementById('kategori').value,
-        ders: ders,
-        kaynak: kaynak,
-        ytUrl: document.getElementById('ytUrl').value,
-        tamamlandi: false
-    };
-
-    db.ref('programlar/' + aktifProfil).push(yeniGorev);
-
-    document.getElementById('ders').value = '';
-    document.getElementById('kaynak').value = '';
-    document.getElementById('ytUrl').value = '';
-}
-
-// DURUM DEĞİŞTİR (TİK)
-function durumDegistir(key, durum) {
-    db.ref('programlar/' + aktifProfil + '/' + key).update({ tamamlandi: durum });
-}
-
-// SİL
-function gorevSil(key) {
-    db.ref('programlar/' + aktifProfil + '/' + key).remove();
-}
-
-// VERİLERİ YÜKLE
 function verileriYukle() {
-    db.ref('programlar/' + aktifProfil).on('value', (snapshot) => {
-        tahtayiCiz(snapshot.val());
+    db.ref('programlar/' + aktifProfil).on('value', (snap) => {
+        const data = snap.val();
+        const tahta = document.getElementById('tahta');
+        tahta.innerHTML = '';
+        ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"].forEach(gun => {
+            let col = `<div class="col"><h4>${gun}</h4>`;
+            if(data) {
+                Object.keys(data).forEach(key => {
+                    if(data[key].gun === gun) {
+                        col += `<div class="task"><b>${data[key].ders}</b><br>${data[key].kaynak}${data[key].ytUrl ? `<a href="${data[key].ytUrl}" class="yt-link" target="_blank">▶️ Video</a>` : ''}</div>`;
+                    }
+                });
+            }
+            tahta.innerHTML += col + '</div>';
+        });
     });
 }
 
-// SAYFA AÇILDIĞINDA BAŞLAT
+function gorevEkle() {
+    db.ref('programlar/' + aktifProfil).push({
+        gun: "Pazartesi", 
+        ders: document.getElementById('ders').value,
+        kaynak: document.getElementById('kaynak').value,
+        ytUrl: document.getElementById('ytUrl').value
+    });
+}
 verileriYukle();
 </script>
 </body>
