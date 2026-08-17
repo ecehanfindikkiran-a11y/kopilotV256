@@ -56,6 +56,28 @@
             gap: 10px;
         }
 
+        .profile-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .profile-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--text);
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .profile-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
         .action-btns {
             display: flex;
             align-items: center;
@@ -66,16 +88,11 @@
             background: var(--bg);
             color: var(--text);
             border: 1px solid var(--border);
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 50px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-round:active {
-            transform: scale(0.95);
         }
 
         .timer-box {
@@ -91,7 +108,7 @@
         /* Form Alanı */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
             padding: 15px;
             border: 1px solid var(--border);
@@ -146,9 +163,14 @@
             border-radius: 8px;
             margin-bottom: 10px;
             position: relative;
-            font-size: 13px;
+            font-size: 12px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             word-break: break-word;
+        }
+
+        .task-card.completed {
+            opacity: 0.5;
+            text-decoration: line-through;
         }
 
         .yt-link-btn {
@@ -157,7 +179,20 @@
             color: #ff4757;
             font-weight: bold;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .btn-card {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -171,6 +206,12 @@
             <button class="btn-round" onclick="toggleFullScreen()">⛶ Ekran</button>
             <div class="timer-box" onclick="toggleTimer()" id="timerDisplay">⏱️ 25:00 (Başlat)</div>
         </div>
+    </div>
+
+    <!-- Profil Seçimi -->
+    <div class="profile-switch">
+        <button class="profile-btn active" id="btnBen" onclick="profilDegistir('ben')">👑 Benim Programım</button>
+        <button class="profile-btn" id="btnSevgili" onclick="profilDegistir('sevgili')">🤍 Sevgilimin Programı</button>
     </div>
 
     <div class="form-grid">
@@ -187,7 +228,7 @@
             <option value="Soru Bankası">📚 Soru Bankası</option>
             <option value="YouTube Kampı">▶️ YouTube Kampı</option>
         </select>
-        <input type="text" id="ders" placeholder="Ders (Örn: Mat)">
+        <input type="text" id="ders" placeholder="Ders">
         <input type="text" id="kaynak" placeholder="Kaynak/Konu">
         <input type="text" id="ytUrl" placeholder="YouTube Linki (Opsiyonel)">
         <button class="btn-add" onclick="gorevEkle()">Programa Ekle</button>
@@ -197,7 +238,7 @@
 </div>
 
 <script>
-// FIREBASE
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyChfFEva4PkZ48zy9rAkWJV7Z_W-5o6BFE",
   databaseURL: "https://kopilot-v16-default-rtdb.firebaseio.com",
@@ -208,26 +249,30 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 let aktifProfil = 'ben';
 
-// 1. GECE MODU
+// PROFİL DEĞİŞTİRME
+function profilDegistir(profil) {
+    aktifProfil = profil;
+    document.getElementById('btnBen').classList.toggle('active', profil === 'ben');
+    document.getElementById('btnSevgili').classList.toggle('active', profil === 'sevgili');
+    verileriYukle();
+}
+
+// GECE MODU
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const btn = document.getElementById('darkBtn');
-    if (document.body.classList.contains('dark-mode')) {
-        btn.innerText = '☀️ Gündüz';
-    } else {
-        btn.innerText = '🌙 Gece';
-    }
+    btn.innerText = document.body.classList.contains('dark-mode') ? '☀️ Gündüz' : '🌙 Gece';
 }
 
-// 2. TAM EKRAN (Mobil Ve Masaüstü Uyumlu)
+// TAM EKRAN
 function toggleFullScreen() {
     let doc = window.document;
     let docEl = doc.documentElement;
-
-    let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-    let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+    let requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullScreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+    let cancelFullScreen = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
 
     if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
         requestFullScreen.call(docEl);
@@ -236,9 +281,9 @@ function toggleFullScreen() {
     }
 }
 
-// 3. POMODORO SAYAÇ (GERÇEK GERİ SAYIM)
+// POMODORO TIMER
 let timerInterval = null;
-let timeLeft = 25 * 60; // 25 dakika (saniye cinsinden)
+let timeLeft = 25 * 60;
 let isTimerRunning = false;
 
 function updateTimerDisplay() {
@@ -248,11 +293,7 @@ function updateTimerDisplay() {
     if (minutes < 10) minutes = '0' + minutes;
     
     const display = document.getElementById('timerDisplay');
-    if(isTimerRunning) {
-        display.innerText = `⏱️ ${minutes}:${seconds} (Durdur)`;
-    } else {
-        display.innerText = `⏱️ ${minutes}:${seconds} (Başlat)`;
-    }
+    display.innerText = isTimerRunning ? `⏱️ ${minutes}:${seconds} (Durdur)` : `⏱️ ${minutes}:${seconds} (Başlat)`;
 }
 
 function toggleTimer() {
@@ -277,7 +318,7 @@ function toggleTimer() {
     updateTimerDisplay();
 }
 
-// TAHTAYI YAZDIRMA
+// TAHTAYI ÇİZME
 function tahtayiCiz(data) {
     const tahta = document.getElementById('haftalikTahta');
     tahta.innerHTML = '';
@@ -291,11 +332,15 @@ function tahtayiCiz(data) {
                 const item = data[key];
                 if (item.gun === gun) {
                     html += `
-                        <div class="task-card">
+                        <div class="task-card ${item.tamamlandi ? 'completed' : ''}">
                             <span style="font-size:10px; color:#888;">${item.kategori || ''}</span><br>
                             <b>${item.ders}</b><br>
                             <span>${item.kaynak}</span><br>
-                            ${item.ytUrl ? `<a href="${item.ytUrl}" target="_blank" class="yt-link-btn">▶️ Videoya Git</a>` : ''}
+                            ${item.ytUrl ? `<a href="${item.ytUrl}" target="_blank" class="yt-link-btn">▶️ Videoya Git</a><br>` : ''}
+                            <div class="card-actions">
+                                <button class="btn-card" onclick="durumDegistir('${key}', ${!item.tamamlandi})">${item.tamamlandi ? '↩️' : '✅'}</button>
+                                <button class="btn-card" onclick="gorevSil('${key}')">🗑️</button>
+                            </div>
                         </div>
                     `;
                 }
@@ -313,7 +358,7 @@ function gorevEkle() {
     const kaynak = document.getElementById('kaynak').value;
     
     if(!ders || !kaynak) {
-        alert("Lütfen ders ve kaynak kısmını doldur aşkım!");
+        alert("Lütfen ders ve kaynak kısımlarını doldur aşkım!");
         return;
     }
 
@@ -322,21 +367,36 @@ function gorevEkle() {
         kategori: document.getElementById('kategori').value,
         ders: ders,
         kaynak: kaynak,
-        ytUrl: document.getElementById('ytUrl').value
+        ytUrl: document.getElementById('ytUrl').value,
+        tamamlandi: false
     };
 
     db.ref('programlar/' + aktifProfil).push(yeniGorev);
 
-    // Temizle
     document.getElementById('ders').value = '';
     document.getElementById('kaynak').value = '';
     document.getElementById('ytUrl').value = '';
 }
 
-// VERİBAĞI DİNLEYİCİSİ
-db.ref('programlar/' + aktifProfil).on('value', (snapshot) => {
-    tahtayiCiz(snapshot.val());
-});
+// DURUM DEĞİŞTİR (TİK)
+function durumDegistir(key, durum) {
+    db.ref('programlar/' + aktifProfil + '/' + key).update({ tamamlandi: durum });
+}
+
+// SİL
+function gorevSil(key) {
+    db.ref('programlar/' + aktifProfil + '/' + key).remove();
+}
+
+// VERİLERİ YÜKLE
+function verileriYukle() {
+    db.ref('programlar/' + aktifProfil).on('value', (snapshot) => {
+        tahtayiCiz(snapshot.val());
+    });
+}
+
+// SAYFA AÇILDIĞINDA BAŞLAT
+verileriYukle();
 </script>
 </body>
 </html>
