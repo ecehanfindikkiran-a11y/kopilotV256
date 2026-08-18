@@ -104,6 +104,17 @@
         .modal h3 { color: var(--accent); margin-top: 0; }
         .modal input[type=range] { width: 100%; margin: 15px 0; }
         .modal-close { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* TEST & MİNİ REHBER STİLLERİ */
+        .quiz-option { display: block; width: 100%; text-align: left; padding: 10px 14px; margin: 6px 0; border: 1px solid #ffd8d8; border-radius: 8px; background: var(--card-color); color: var(--text-color); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .quiz-option:hover { background: #fff0f3; }
+        .quiz-option.correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
+        .quiz-option.wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+
+        /* AYLIK/YILLIK PLAN STİLLERİ */
+        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .plan-box { background: var(--card-color); border: 2px solid var(--header-border); padding: 15px; border-radius: 10px; }
+        .plan-box h4 { color: var(--accent); margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid var(--form-bg); padding-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -117,7 +128,9 @@
     </div>
     <div class="sidebar-menu">
         <button class="menu-item active" onclick="sayfaDegistir('anaSayfa')">🏠 Programım & Tahta</button>
-        <button class="menu-item" onclick="sayfaDegistir('yksHedefSayfasi')">🎯 YKS 2027 & Hedefler</button>
+        <button class="menu-item" onclick="sayfaDegistir('planlamaSayfasi')">📅 Aylık & Yıllık Planlama</button>
+        <button class="menu-item" onclick="sayfaDegistir('yksRehberSayfasi')">🎯 YKS Rehberi & Mini Test</button>
+        <button class="menu-item" onclick="sayfaDegistir('yksHedefSayfasi')">🎓 YKS 2027 & Hedefler</button>
         <button class="menu-item" onclick="sayfaDegistir('sayacSayfasi')">⏱️ Çalışma Sayacı</button>
         <button class="menu-item" onclick="sayfaDegistir('skorSayfasi')">🏆 Tatlı Yarış Panosu</button>
         <button class="menu-item" onclick="sayfaDegistir('netSayfasi')">📚 Deneme Net Takibi</button>
@@ -190,7 +203,75 @@
         <div class="weekly-board" id="haftalikTahta"></div>
     </div>
 
-    <!-- 2. SEKME: YKS 2027 & HEDEFLER -->
+    <!-- NEW 2. SEKME: AYLIK & YILLIK PLANLAMA -->
+    <div id="planlamaSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>📅 Kabaca Aylık Ders & Konu Hedefleri</h3>
+            <p style="font-size: 12px; color: #666;">Aylara bölerek hangi ay hangi konuları bitireceğinizi kabaca planlayın aşkım!</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="planAyInput" placeholder="Ay Seç (ör: Eylül - Ekim)" style="width: 30%;">
+                <input type="text" id="planDetayInput" placeholder="Hedeflenen Konular / Kamplar (ör: TYT Mat Bitiş + Türkçe Paragraf)" style="width: 70%;">
+                <button class="btn-add" style="width: auto; padding: 0 20px;" onclick="aylikPlanEkle()">Ekle 📌</button>
+            </div>
+            <div id="aylikPlanListesi" class="plan-grid"></div>
+        </div>
+
+        <div class="feature-card">
+            <h3>🗓️ Yıllık Genel Çalışma Çizelgesi</h3>
+            <div class="plan-grid">
+                <div class="plan-box">
+                    <h4>🍂 Sonbahar (Eylül - Kasım)</h4>
+                    <textarea id="yillikSonbahar" placeholder="Sonbahar dönemi genel hedefler..." style="width: 90%; height: 80px;" onchange="yillikPlanKaydet()"></textarea>
+                </div>
+                <div class="plan-box">
+                    <h4>❄️ Kış (Aralık - Şubat)</h4>
+                    <textarea id="yillikKis" placeholder="Kış dönemi genel hedefler..." style="width: 90%; height: 80px;" onchange="yillikPlanKaydet()"></textarea>
+                </div>
+                <div class="plan-box">
+                    <h4>🌸 İlkbahar (Mart - Mayıs)</h4>
+                    <textarea id="yillikBahar" placeholder="Bahar dönemi genel hedefler..." style="width: 90%; height: 80px;" onchange="yillikPlanKaydet()"></textarea>
+                </div>
+                <div class="plan-box">
+                    <h4>☀️ Son Düzlük (Haziran)</h4>
+                    <textarea id="yillikSonDuzluk" placeholder="Genel denemeler & seri tekrarlar..." style="width: 90%; height: 80px;" onchange="yillikPlanKaydet()"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW 3. SEKME: YKS REHBERİ & MİNİ TEST -->
+    <div id="yksRehberSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>💡 YKS Çalışma Taktikleri & Rehber</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px;">
+                <div style="background: var(--card-color); padding: 10px; border-radius: 8px; border-left: 4px solid var(--accent);">
+                    <b>📌 Paragraf & Problem Mola Vermez!</b><br>Her gün aksatmadan en az 20 Paragraf + 10 Problem çözülmeli.
+                </div>
+                <div style="background: var(--card-color); padding: 10px; border-radius: 8px; border-left: 4px solid #eccc68;">
+                    <b>🔄 Yanlış Defteri Tut!</b><br>Yapılamayan soruları 'Zor Sorular' kısmına mutlaka ekleyip haftalık tekrar et.
+                </div>
+                <div style="background: var(--card-color); padding: 10px; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                    <b>⏱️ Süreli Çözüm Alışkanlığı:</b><br>Test çözerken Pomodoro veya kronometre kullanarak zaman yönetimini geliştir.
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <h3>📝 ÖSYM Çıkmış & Benzer Soru Pratiği</h3>
+            <p style="font-size: 12px; color: #666;">Bilgilerini taze tutmak için minik bir soru testi!</p>
+            <div id="quizContainer">
+                <div style="margin-bottom: 15px;">
+                    <span id="quizDersTag" class="tag" style="font-size: 12px;">TYT Türkçe</span>
+                    <h4 id="quizSoruMetni" style="margin: 10px 0; font-size: 15px; color: var(--text-color);">Soru yükleniyor...</h4>
+                </div>
+                <div id="quizSecenekler"></div>
+                <div id="quizSonuc" style="margin-top: 15px; font-weight: bold; font-size: 14px;"></div>
+                <button class="btn-add" style="margin-top: 15px; width: auto; padding: 8px 20px;" onclick="sonrakiSoru()">Sonraki Soruya Geç ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. SEKME: YKS 2027 & HEDEFLER -->
     <div id="yksHedefSayfasi" class="page-section">
         <div class="feature-card" style="text-align: center;">
             <h3>🎯 YKS 2027 Geri Sayım</h3>
@@ -216,7 +297,7 @@
         </div>
     </div>
 
-    <!-- 3. SEKME: ÖZEL ÇALIŞMA SAYACI -->
+    <!-- 5. SEKME: ÖZEL ÇALIŞMA SAYACI -->
     <div id="sayacSayfasi" class="page-section">
         <div class="timer-container">
             <h3>⏱️ Odaklanma Sayacı (Pomodoro)</h3>
@@ -234,7 +315,7 @@
         </div>
     </div>
 
-    <!-- 4. SEKME: TATLI YARIŞ PANOSU -->
+    <!-- 6. SEKME: TATLI YARIŞ PANOSU -->
     <div id="skorSayfasi" class="page-section">
         <div class="feature-card">
             <h3>🏆 Haftalık Başarı Kıyaslaması</h3>
@@ -254,7 +335,7 @@
         </div>
     </div>
 
-    <!-- 5. SEKME: DENEME NET TAKİBİ -->
+    <!-- 7. SEKME: DENEME NET TAKİBİ -->
     <div id="netSayfasi" class="page-section">
         <div class="feature-card">
             <h3>📚 Deneme Net Kaydı</h3>
@@ -270,7 +351,7 @@
         </div>
     </div>
 
-    <!-- 6. SEKME: ODAKLANMA SESLERİ -->
+    <!-- 8. SEKME: ODAKLANMA SESLERİ -->
     <div id="muzikSayfasi" class="page-section">
         <div class="feature-card" style="text-align:center;">
             <h3>🎵 Arkaplan Çalışma Sesleri</h3>
@@ -283,7 +364,7 @@
         </div>
     </div>
 
-    <!-- 7. SEKME: ZOR SORULAR DEFTERİ -->
+    <!-- 9. SEKME: ZOR SORULAR DEFTERİ -->
     <div id="soruSayfasi" class="page-section">
         <div class="feature-card">
             <h3>❓ Yapılamayan Sorular & Notlar</h3>
@@ -294,7 +375,7 @@
         </div>
     </div>
 
-    <!-- 8. SEKME: MOTİVASYON NOTLARI -->
+    <!-- 10. SEKME: MOTİVASYON NOTLARI -->
     <div id="notlarSayfasi" class="page-section">
         <div class="feature-card" style="text-align: center;">
             <h3>💌 Canlı Motivasyon Notları</h3>
@@ -354,6 +435,7 @@ function sayfaDegistir(sayfaId) {
     document.getElementById(sayfaId).classList.add('active');
     toggleSidebar();
     if(sayfaId === 'skorSayfasi') skorGuncelle();
+    if(sayfaId === 'yksRehberSayfasi') quizSoruYukle();
 }
 
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
@@ -377,6 +459,127 @@ function updateYksTimer() {
 }
 setInterval(updateYksTimer, 1000);
 updateYksTimer();
+
+// AYLIK VE YILLIK PLANLAMA FONKSİYONLARI
+function aylikPlanEkle() {
+    const ay = document.getElementById('planAyInput').value;
+    const detay = document.getElementById('planDetayInput').value;
+    if(!ay || !detay) return;
+
+    db.ref('aylikPlanlar/' + aktifProfil).push({ ay, detay });
+    document.getElementById('planAyInput').value = '';
+    document.getElementById('planDetayInput').value = '';
+}
+
+db.ref('aylikPlanlar/' + aktifProfil).on('value', (snap) => {
+    const list = document.getElementById('aylikPlanListesi');
+    list.innerHTML = '';
+    const data = snap.val();
+    if(data) {
+        Object.keys(data).reverse().forEach(k => {
+            const item = data[k];
+            list.innerHTML += `<div class="plan-box">
+                <h4>${item.ay}</h4>
+                <p style="font-size:13px; margin:0;">${item.detay}</p>
+            </div>`;
+        });
+    }
+});
+
+function yillikPlanKaydet() {
+    db.ref('yillikPlanlar/' + aktifProfil).set({
+        sonbahar: document.getElementById('yillikSonbahar').value,
+        kis: document.getElementById('yillikKis').value,
+        bahar: document.getElementById('yillikBahar').value,
+        sonDuzluk: document.getElementById('yillikSonDuzluk').value
+    });
+}
+
+db.ref('yillikPlanlar/' + aktifProfil).on('value', (snap) => {
+    const val = snap.val();
+    if(val) {
+        document.getElementById('yillikSonbahar').value = val.sonbahar || '';
+        document.getElementById('yillikKis').value = val.kis || '';
+        document.getElementById('yillikBahar').value = val.bahar || '';
+        document.getElementById('yillikSonDuzluk').value = val.sonDuzluk || '';
+    }
+});
+
+// MİNİ TEST & QUIZ SİSTEMİ
+const ornekSorular = [
+    {
+        ders: "TYT Türkçe (Dil Bilgisi)",
+        soru: "Aşağıdaki cümlelerin hangisinde ögelerin dizilişi 'Özne - Nesne - Yüklem' şeklindedir?",
+        secenekler: [
+            "A) Baharın gelişiyle ağaçlar yeşillendi.",
+            "B) Küçük kız, elindeki oyuncağı sıkıca tutuyordu.",
+            "C) Öğretmenimiz, bu zor konuyu detaylarıyla anlattı.",
+            "D) Yolcular otobüsün gelmesini sabırsızlıkla beklediler."
+        ],
+        dogru: 1,
+        aciklama: "B şıkkında: Küçük kız (Özne), elindeki oyuncağı (Nesne), sıkıca (Zarf T.), tutuyordu (Yüklem)."
+    },
+    {
+        ders: "TYT Matematik (Problem)",
+        soru: "Bir kasanın ağırlığı boşken x kg, 2/5'i elma doluyken y kg'dır. Kasanın tamamı elma doluyken ağırlığı kaç kg olur?",
+        secenekler: [
+            "A) (5y - 3x) / 2",
+            "B) (5y - 2x) / 2",
+            "C) 5y - 2x",
+            "D) 5y + x"
+        ],
+        dogru: 0,
+        aciklama: "Sadece elmanın 2/5'i = y - x ise, tamamı = (y - x) * 5/2. Kasa ile beraber toplam = (5y - 3x) / 2 olur."
+    },
+    {
+        ders: "TYT Tarih (Tarih ve Zaman)",
+        soru: "Tarihte bilinen ilk yazılı antlaşma olan Kadeş Antlaşması hangi iki devlet arasında imzalanmıştır?",
+        secenekler: [
+            "A) Sümerler - Babil",
+            "B) Hititler - Mısır",
+            "C) Asurlar - Persler",
+            "D) Frigler - Lidyalılar"
+        ],
+        dogru: 1,
+        aciklama: "Kadeş Antlaşması MÖ 1280 yılında Mısır ve Hititler arasında yapılmıştır."
+    }
+];
+
+let mevcutSoruIndex = 0;
+
+function quizSoruYukle() {
+    const q = ornekSorular[mevcutSoruIndex];
+    document.getElementById('quizDersTag').innerText = q.ders;
+    document.getElementById('quizSoruMetni').innerText = q.soru;
+    document.getElementById('quizSonuc').innerText = '';
+    
+    const secenekDiv = document.getElementById('quizSecenekler');
+    secenekDiv.innerHTML = '';
+
+    q.secenekler.forEach((s, idx) => {
+        secenekDiv.innerHTML += `<button class="quiz-option" onclick="cevapKontrol(${idx}, this)">${s}</button>`;
+    });
+}
+
+function cevapKontrol(secilenIndex, btn) {
+    const q = ornekSorular[mevcutSoruIndex];
+    const tumButonlar = document.querySelectorAll('.quiz-option');
+    tumButonlar.forEach(b => b.disabled = true);
+
+    if (secilenIndex === q.dogru) {
+        btn.classList.add('correct');
+        document.getElementById('quizSonuc').innerHTML = `<span style="color:#2ecc71;">🎉 Tebrikler Aşkım! Doğru Cevap!</span><br><small style="color:#666;">${q.aciklama}</small>`;
+    } else {
+        btn.classList.add('wrong');
+        tumButonlar[q.dogru].classList.add('correct');
+        document.getElementById('quizSonuc').innerHTML = `<span style="color:#e74c3c;">❌ Üzülme Aşkım, Doğru Cevap Yeşil Olan!</span><br><small style="color:#666;">${q.aciklama}</small>`;
+    }
+}
+
+function sonrakiSoru() {
+    mevcutSoruIndex = (mevcutSoruIndex + 1) % ornekSorular.length;
+    quizSoruYukle();
+}
 
 // HEDEFLERİ CANLI KAYDETME VE DİNLEME
 function hedefleriKaydet() {
@@ -543,9 +746,13 @@ function saveProgramData(data) { db.ref('programlar/' + aktifProfil).set(data); 
 
 function profilDegistir(profil) {
     db.ref('programlar/' + aktifProfil).off();
+    db.ref('aylikPlanlar/' + aktifProfil).off();
+    db.ref('yillikPlanlar/' + aktifProfil).off();
+    
     aktifProfil = profil;
     document.getElementById('btnBen').classList.toggle('active', profil === 'ben');
     document.getElementById('btnSevgili').classList.toggle('active', profil === 'sevgili');
+    
     liveListen();
 }
 
@@ -673,3 +880,4 @@ liveListen();
 </script>
 </body>
 </html>
+
