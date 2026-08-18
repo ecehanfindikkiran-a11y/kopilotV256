@@ -115,6 +115,14 @@
         .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
         .plan-box { background: var(--card-color); border: 2px solid var(--header-border); padding: 15px; border-radius: 10px; }
         .plan-box h4 { color: var(--accent); margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid var(--form-bg); padding-bottom: 5px; }
+
+        /* İNTERAKTİF HATA DEFTERİ VE MEB KÖŞESİ STİLLERİ */
+        .canvas-container { position: relative; width: 100%; max-width: 500px; margin: 10px auto; border: 2px dashed var(--accent); border-radius: 10px; overflow: hidden; background: #fff; }
+        canvas { display: block; width: 100%; cursor: crosshair; }
+        .draw-tools { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+        .draw-btn { padding: 6px 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; background: var(--accent); color: white; }
+        .meb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
+        .meb-card { background: var(--card-color); border: 1px solid #ffd8d8; padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -131,11 +139,12 @@
         <button class="menu-item" onclick="sayfaDegistir('planlamaSayfasi')">📅 Aylık & Yıllık Planlama</button>
         <button class="menu-item" onclick="sayfaDegistir('yksRehberSayfasi')">🎯 YKS Rehberi & Mini Test</button>
         <button class="menu-item" onclick="sayfaDegistir('yksHedefSayfasi')">🎓 YKS 2027 & Hedefler</button>
+        <button class="menu-item" onclick="sayfaDegistir('mebSayfasi')">📖 MEB & ÖSYM Özel Köşesi</button>
+        <button class="menu-item" onclick="sayfaDegistir('soruSayfasi')">📸 İnteraktif Hata Defteri</button>
         <button class="menu-item" onclick="sayfaDegistir('sayacSayfasi')">⏱️ Çalışma Sayacı</button>
         <button class="menu-item" onclick="sayfaDegistir('skorSayfasi')">🏆 Tatlı Yarış Panosu</button>
         <button class="menu-item" onclick="sayfaDegistir('netSayfasi')">📚 Deneme Net Takibi</button>
         <button class="menu-item" onclick="sayfaDegistir('muzikSayfasi')">🎵 Odaklanma Sesleri</button>
-        <button class="menu-item" onclick="sayfaDegistir('soruSayfasi')">❓ Zor Sorular Defteri</button>
         <button class="menu-item" onclick="sayfaDegistir('notlarSayfasi')">💌 Motivasyon Notları</button>
         <button class="menu-item" onclick="toggleDarkMode()">🌙 Gece Modu</button>
         <button class="menu-item" onclick="toggleFullScreen()">⛶ Tam Ekran</button>
@@ -297,7 +306,71 @@
         </div>
     </div>
 
-    <!-- 5. SEKME: ÖZEL ÇALIŞMA SAYACI -->
+    <!-- NEW: MEB & ÖSYM ÖZEL KÖŞESİ -->
+    <div id="mebSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>📚 MEB Konu Özetleri & Çıkmış Sorular Bankası</h3>
+            <p style="font-size:12px; color:#666;">Resmi MEB müfredatı özetleri, ÖSYM çıkmış soruları ve ikiz soru pratikleri!</p>
+
+            <div class="meb-grid">
+                <div class="meb-card">
+                    <b>📖 MEB Konu Özetleri</b>
+                    <p style="font-size:11px; color:#666;">Kazanım bazlı hızlı özet notları.</p>
+                    <a href="https://ogmmateryal.eba.gov.tr/" target="_blank" class="yt-link-btn">➡️ OGM Materyal'e Git</a>
+                </div>
+                <div class="meb-card">
+                    <b>📝 MEB Mini Denemeler</b>
+                    <p style="font-size:11px; color:#666;">MEB'in yayınladığı online denemeler.</p>
+                    <a href="https://ogmmateryal.eba.gov.tr/yks-kamptestleri" target="_blank" class="yt-link-btn">➡️ MEB Denemelere Bak</a>
+                </div>
+                <div class="meb-card">
+                    <b>🎓 ÖSYM Çıkmış Sorular</b>
+                    <p style="font-size:11px; color:#666;">Son yılların TYT ve AYT arşivleri.</p>
+                    <a href="https://www.osym.gov.tr" target="_blank" class="yt-link-btn">➡️ ÖSYM Arşivine Git</a>
+                </div>
+                <div class="meb-card">
+                    <b>👯 İkiz Sorular (Benzer Pratik)</b>
+                    <p style="font-size:11px; color:#666;">Çıkmış soruların mantığında ikiz sorular.</p>
+                    <button class="draw-btn" style="margin-top:5px;" onclick="ikizSoruGoster()">İkiz Soru Çöz ✨</button>
+                </div>
+            </div>
+            
+            <div id="ikizSoruAlani" style="display:none; margin-top:15px; padding:15px; background:var(--card-color); border-radius:8px; border:2px dashed var(--accent);">
+                <h4 style="color:var(--accent); margin-top:0;">✨ Günün ÖSYM İkiz Sorusu (Matematik)</h4>
+                <p style="font-size:13px;"><b>Soru:</b> Bir veri grubundaki sayılar küçükten büyüğe sıralandığında veri sayısı tek ise ortadaki sayıya medyan denir. Sayı dizisi: 3, 5, 8, x, 12, 15. Bu veri dizisinin medyanı 9 olduğuna göre x kaçtır?</p>
+                <button class="draw-btn" onclick="alert('Çözüm: Sayı adedi 6 (çift). Medyan ortadaki iki sayının ortalamasıdır: (8 + x) / 2 = 9 => 8 + x = 18 => x = 10 olur!')">Çözümü Göster 💡</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. SEKME: İNTERAKTİF HATA DEFTERİ (FOTOĞRAF VE KARALAMA) -->
+    <div id="soruSayfasi" class="page-section">
+        <div class="feature-card">
+            <h3>📸 Fotoğraflı & Çizimli Hata Defteri</h3>
+            <input type="text" id="soruDers" placeholder="Ders & Konu (ör: Mat - Permütasyon)" style="width:95%; margin-bottom:10px;">
+            <textarea id="soruNot" placeholder="Soru hakkındaki notların veya hatan..." style="width:95%; height:50px; margin-bottom:10px;"></textarea>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-weight:bold; font-size:12px; display:block; margin-bottom:4px;">📷 Soru Fotoğrafı Yükle:</label>
+                <input type="file" id="soruFotoInput" accept="image/*" onchange="resimYukleCanvas(event)">
+            </div>
+
+            <!-- ÇİZİM VE KARALAMA ALANI -->
+            <div class="canvas-container" id="canvasWrap" style="display:none;">
+                <canvas id="drawCanvas"></canvas>
+            </div>
+            <div class="draw-tools" id="drawTools" style="display:none;">
+                <span>Renk:</span>
+                <input type="color" id="drawColor" value="#ff0000" style="padding:0; width:30px; height:30px; border:none; cursor:pointer;">
+                <button class="draw-btn" onclick="canvasTemizle()">🔄 Temizle</button>
+            </div>
+
+            <button class="btn-add" style="margin-top:15px;" onclick="fotoSoruEkle()">Soruyu Hata Defterine Kaydet 📌</button>
+            <div id="soruListesi" style="margin-top:15px; display:flex; flex-direction:column; gap:12px;"></div>
+        </div>
+    </div>
+
+    <!-- 6. SEKME: ÖZEL ÇALIŞMA SAYACI -->
     <div id="sayacSayfasi" class="page-section">
         <div class="timer-container">
             <h3>⏱️ Odaklanma Sayacı (Pomodoro)</h3>
@@ -315,7 +388,7 @@
         </div>
     </div>
 
-    <!-- 6. SEKME: TATLI YARIŞ PANOSU -->
+    <!-- 7. SEKME: TATLI YARIŞ PANOSU -->
     <div id="skorSayfasi" class="page-section">
         <div class="feature-card">
             <h3>🏆 Haftalık Başarı Kıyaslaması</h3>
@@ -335,7 +408,7 @@
         </div>
     </div>
 
-    <!-- 7. SEKME: DENEME NET TAKİBİ -->
+    <!-- 8. SEKME: DENEME NET TAKİBİ -->
     <div id="netSayfasi" class="page-section">
         <div class="feature-card">
             <h3>📚 Deneme Net Kaydı</h3>
@@ -351,7 +424,7 @@
         </div>
     </div>
 
-    <!-- 8. SEKME: ODAKLANMA SESLERİ -->
+    <!-- 9. SEKME: ODAKLANMA SESLERİ -->
     <div id="muzikSayfasi" class="page-section">
         <div class="feature-card" style="text-align:center;">
             <h3>🎵 Arkaplan Çalışma Sesleri</h3>
@@ -361,17 +434,6 @@
                 <a href="https://www.youtube.com/watch?v=mPZkdNF6084" target="_blank" class="btn-timer-action" style="background:#34495e; text-decoration:none;">🌧️ Yağmur Sesi</a>
                 <a href="https://www.youtube.com/watch?v=4vIQON2fDWM" target="_blank" class="btn-timer-action" style="background:#e67e22; text-decoration:none;">📖 Kütüphane Sesi</a>
             </div>
-        </div>
-    </div>
-
-    <!-- 9. SEKME: ZOR SORULAR DEFTERİ -->
-    <div id="soruSayfasi" class="page-section">
-        <div class="feature-card">
-            <h3>❓ Yapılamayan Sorular & Notlar</h3>
-            <input type="text" id="soruDers" placeholder="Ders & Konu (ör: Mat - Permütasyon)" style="width:95%; margin-bottom:10px;">
-            <textarea id="soruNot" placeholder="Soru mantığını veya çözüm yolunu yaz..." style="width:95%; height:60px; margin-bottom:10px;"></textarea>
-            <button class="btn-add" onclick="soruEkle()">Soru Notunu Ekle 📌</button>
-            <div id="soruListesi" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;"></div>
         </div>
     </div>
 
@@ -459,6 +521,116 @@ function updateYksTimer() {
 }
 setInterval(updateYksTimer, 1000);
 updateYksTimer();
+
+// MEB İKİZ SORU GÖSTERİMİ
+function ikizSoruGoster() {
+    const el = document.getElementById('ikizSoruAlani');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// CANVAS VE RESİM YÜKLEME KARALAMA MANTIĞI
+let canvas, ctx, currentImg = null;
+let isDrawing = false;
+
+function initCanvas() {
+    canvas = document.getElementById('drawCanvas');
+    ctx = canvas.getContext('2d');
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { startDrawing(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); });
+    canvas.addEventListener('touchend', stopDrawing);
+}
+
+function resimYukleCanvas(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        currentImg = new Image();
+        currentImg.onload = function() {
+            document.getElementById('canvasWrap').style.display = 'block';
+            document.getElementById('drawTools').style.display = 'flex';
+            if(!canvas) initCanvas();
+
+            canvas.width = currentImg.width > 500 ? 500 : currentImg.width;
+            canvas.height = (currentImg.height * canvas.width) / currentImg.width;
+            ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+        }
+        currentImg.src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+}
+
+function getCanvasPos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const pos = getCanvasPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+}
+
+function draw(e) {
+    if(!isDrawing) return;
+    const pos = getCanvasPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = document.getElementById('drawColor').value;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+function stopDrawing() { isDrawing = false; }
+
+function canvasTemizle() {
+    if(currentImg && ctx) {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+    }
+}
+
+// FOTOĞRAFLI HATA DEFTERİ KAYIT
+function fotoSoruEkle() {
+    const ders = document.getElementById('soruDers').value;
+    const not = document.getElementById('soruNot').value;
+    let imgData = canvas && document.getElementById('canvasWrap').style.display !== 'none' ? canvas.toDataURL() : null;
+
+    if(!ders && !not && !imgData) return;
+
+    db.ref('sorular/' + aktifProfil).push({ ders, not, img: imgData });
+    
+    document.getElementById('soruDers').value = '';
+    document.getElementById('soruNot').value = '';
+    document.getElementById('soruFotoInput').value = '';
+    if(document.getElementById('canvasWrap')) document.getElementById('canvasWrap').style.display = 'none';
+    if(document.getElementById('drawTools')) document.getElementById('drawTools').style.display = 'none';
+}
+
+db.ref('sorular/' + aktifProfil).on('value', (snap) => {
+    const list = document.getElementById('soruListesi');
+    list.innerHTML = '';
+    const data = snap.val();
+    if(data) {
+        Object.keys(data).reverse().forEach(k => {
+            const i = data[k];
+            list.innerHTML += `<div style="background:var(--card-color); padding:12px; border-radius:8px; border-left:4px solid #e67e22;">
+                <b>${i.ders || 'Ders Belirtilmedi'}</b><br>
+                <span>${i.not || ''}</span>
+                ${i.img ? `<br><img src="${i.img}" style="max-width:100%; margin-top:8px; border-radius:6px; border:1px solid #ddd;">` : ''}
+            </div>`;
+        });
+    }
+});
 
 // AYLIK VE YILLIK PLANLAMA FONKSİYONLARI
 function aylikPlanEkle() {
@@ -662,7 +834,7 @@ function netEkle() {
     const tur = document.getElementById('netTür').value;
     const turkce = parseFloat(document.getElementById('netTurkce').value) || 0;
     const mat = parseFloat(document.getElementById('netMat').value) || 0;
-    const sos = parseFloat(document.getElementById('netSos').value) || 0;
+    const sos = parseFloat(document.getElementById('netSosやる').value) || 0;
     const fen = parseFloat(document.getElementById('netFen').value) || 0;
     const toplam = turkce + mat + sos + fen;
 
@@ -679,30 +851,6 @@ db.ref('netler/' + aktifProfil).on('value', (snap) => {
             list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid var(--accent);">
                 <b>${i.tur} (${i.tarih})</b> - Toplam Net: <b style="color:var(--accent);">${i.toplam}</b><br>
                 <small>Tr/Ed: ${i.turkce} | Mat: ${i.mat} | Sos: ${i.sos} | Fen: ${i.fen}</small>
-            </div>`;
-        });
-    }
-});
-
-// ZOR SORULAR
-function soruEkle() {
-    const ders = document.getElementById('soruDers').value;
-    const not = document.getElementById('soruNot').value;
-    if(!ders || !not) return;
-    db.ref('sorular/' + aktifProfil).push({ ders, not });
-    document.getElementById('soruDers').value = '';
-    document.getElementById('soruNot').value = '';
-}
-
-db.ref('sorular/' + aktifProfil).on('value', (snap) => {
-    const list = document.getElementById('soruListesi');
-    list.innerHTML = '';
-    const data = snap.val();
-    if(data) {
-        Object.keys(data).reverse().forEach(k => {
-            const i = data[k];
-            list.innerHTML += `<div style="background:var(--card-color); padding:10px; border-radius:8px; border-left:4px solid #e67e22;">
-                <b>${i.ders}</b><br><span>${i.not}</span>
             </div>`;
         });
     }
