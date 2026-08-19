@@ -194,7 +194,15 @@
                 <!-- JS İLE DOLACAK -->
             </select>
 
-            <input type="text" id="kaynak" placeholder="Kaynak Adı (ör: 345, Bilgi Sarmal)">
+            <!-- YAYIN VE KİTAP SEÇİM ALANLARI -->
+            <select id="yayinSelect" onchange="kitaplariYukle()">
+                <!-- JS İLE DOLACAK -->
+            </select>
+
+            <select id="kitapSelect">
+                <!-- JS İLE DOLACAK -->
+            </select>
+
             <input type="number" id="toplamBirim" placeholder="Test / Video Sayısı" min="1">
             <input type="number" id="birimSüre" placeholder="1 Test/Video Kaç Dk?" value="15" min="1">
             <input type="text" id="ytUrl" placeholder="YouTube Linki (Opsiyonel)">
@@ -487,7 +495,81 @@ const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumart
 let aktifProfil = 'ben';
 let localProgramData = [];
 
-// MÜFREDAT VE HOCA VERİ TABANI (PDF VERİLERİ)
+// YAYIN VE POPÜLER KİTAP VERİ TABANI
+const yayinlarData = {
+    "345 Yayınları": [
+        "TYT Matematik Soru Bankası", "AYT Matematik Soru Bankası", "TYT Türkçe Soru Bankası", 
+        "TYT Fizik Soru Bankası", "AYT Fizik Soru Bankası", "TYT Kimya Soru Bankası", "AYT Kimya Soru Bankası",
+        "TYT Biyoloji Soru Bankası", "AYT Biyoloji Soru Bankası", "TYT Fen Denemeleri", "TYT Matematik Denemeleri"
+    ],
+    "Bilgi Sarmal": [
+        "TYT Matematik Soru Bankası", "AYT Matematik Soru Bankası", "TYT Paragraf Soru Bankası", 
+        "TYT Problem Soru Bankası", "TYT Türkçe Soru Bankası", "TYT-AYT Geometri Soru Bankası",
+        "TYT Fizik Soru Bankası", "AYT Fizik Soru Bankası", "TYT Kimya Soru Bankası", "AYT Kimya Soru Bankası",
+        "TYT Biyoloji Soru Bankası", "AYT Biyoloji Soru Bankası", "TYT Tarih / Coğrafya Soru Bankaları"
+    ],
+    "Barış Yayınları": [
+        "Barış Çelenk TYT Matematik Soru Bankası", "Barış Çelenk AYT Matematik Soru Bankası",
+        "Barış Yayınları Geometri Soru Bankası", "Barış Yayınları Türev-İntegral Fasikülü",
+        "Barış Yayınları Trigonometri Fasikülü", "Barış Yayınları AYT Matematik Denemeleri"
+    ],
+    "Acil Yayınları": [
+        "Acil Matematik TYT Soru Bankası", "Acil Matematik AYT Soru Bankası",
+        "Acil Geometri Soru Bankası", "Acil Matematik İlaç Serisi (TYT-AYT)",
+        "Acil Trigonometri Fasikülü", "Acil Limit-Türev-İntegral Fasikülü", "Acil Rejenerasyon Denemeleri"
+    ],
+    "3D Yayınları": [
+        "3D TYT Matematik Soru Bankası", "3D AYT Matematik Soru Bankası", "3D TYT-AYT Geometri Soru Bankası",
+        "3D TYT Türkçe Soru Bankası", "3D TYT Fizik Soru Bankası", "3D AYT Fizik Soru Bankası",
+        "3D TYT Kimya Soru Bankası", "3D AYT Kimya Soru Bankası", "3D TYT Biyoloji Soru Bankası", "3D Simülasyon Denemeleri"
+    ],
+    "Orijinal Yayınları": [
+        "Orijinal TYT Matematik Soru Bankası", "Orijinal AYT Matematik Soru Bankası",
+        "Orijinal Geometri Soru Bankası", "Orijinal Mikro Orijinal TYT Matematik",
+        "Orijinal Trigonometri / LTİ Fasikülleri", "Orijinal AYT Matematik Denemeleri"
+    ],
+    "Apotemi Yayınları": [
+        "Apotemi Trigonometri Fasikülü", "Apotemi Türev Fasikülü", "Apotemi İntegral Fasikülü",
+        "Apotemi Limit-Süreklilik Fasikülü", "Apotemi Fonksiyonlar Fasikülü", "Apotemi Problem Fasikülü",
+        "Apotemi Modern Fizik Fasikülü", "Apotemi Sistemler (Biyoloji) Fasikülü", "Apotemi TYT Fen Denemeleri"
+    ],
+    "KR Akademi": [
+        "Poster Notlar Serisi (TYT-AYT)", "Hızlı Tekrar Soru Bankaları",
+        "YKS Haritalarla Coğrafya / Tarih", "Özel Ders Konu Anlatım Föyü"
+    ],
+    "Mert Hoca Yayınları": [
+        "70 Günde TYT Matematik Kampı Video Ders Kitabı", "42 Günde AYT Matematik Kampı Video Ders Kitabı",
+        "60 Günde Geometri Kampı Video Ders Kitabı", "Efişinado Testleri Soru Bankası"
+    ],
+    "Eyüp B. Yayınları": [
+        "Eyüp B. TYT Matematik Video Ders Kitabı", "Eyüp B. AYT Matematik Video Ders Kitabı",
+        "Eyüp B. Geometri Video Ders Kitabı", "Eyüp B. 3D VDD Matematik Notları"
+    ],
+    "Orbital Yayınları": [
+        "Orbital TYT Kimya Soru Bankası", "Orbital AYT Kimya Soru Bankası",
+        "Orbital Kimya Özet Notlar & Denemeler"
+    ],
+    "Ferrum (Yakup Hoca)": [
+        "Ferrum TYT Kimya Video Ders Notları", "Ferrum AYT Kimya Video Ders Notları",
+        "Ferrum Kimya Soru Bankası & Kamp Föyü"
+    ],
+    "Palme Yayınları": [
+        "Palme TYT Biyoloji Soru Bankası", "Palme AYT Biyoloji Soru Bankası",
+        "Palme TYT Kimya Soru Bankası", "Palme AYT Kimya Soru Bankası",
+        "Palme TYT-AYT Fizik Soru Bankaları"
+    ],
+    "Biyotik Yayınları": [
+        "Biyotik TYT Biyoloji Soru Bankası", "Biyotik AYT Biyoloji Soru Bankası",
+        "Biyotik Biyoloji Deneme Bankası"
+    ],
+    "Biyoanaliz Yayınları": [
+        "Biyoanaliz TYT Biyoloji Soru Bankası", "Biyoanaliz AYT Biyoloji Soru Bankası",
+        "Biyoanaliz Biyoloji Özet Kamp Föyü"
+    ],
+    "Diğer / Özel": ["Özel Soru Bankası", "Fasikül", "Deneme Sınavı", "Yaprak Test"]
+};
+
+// MÜFREDAT VE HOCA VERİ TABANI
 const mufredatData = {
     TYT: {
         "Türkçe": [
@@ -597,6 +679,7 @@ function mufredatGuncelle() {
     });
 
     konulariYukle();
+    yayinlariYukle();
 }
 
 function konulariYukle() {
@@ -619,7 +702,34 @@ function konulariYukle() {
     });
 }
 
-// SAYFA İLK AÇILIŞINDA MÜFREDATI YÜKLE
+function yayinlariYukle() {
+    const yayinSelect = document.getElementById('yayinSelect');
+    yayinSelect.innerHTML = '<option value="">📚 Yayın Seçiniz...</option>';
+    
+    Object.keys(yayinlarData).forEach(y => {
+        yayinSelect.innerHTML += `<option value="${y}">${y}</option>`;
+    });
+
+    kitaplariYukle();
+}
+
+function kitaplariYukle() {
+    const yayin = document.getElementById('yayinSelect').value;
+    const kitapSelect = document.getElementById('kitapSelect');
+    kitapSelect.innerHTML = '';
+
+    if (!yayin) {
+        kitapSelect.innerHTML = '<option value="Özel Kaynak">📖 Önce Yayın Seçiniz</option>';
+        return;
+    }
+
+    const kitaplar = yayinlarData[yayin] || ["Özel Kitap / Fasikül"];
+    kitaplar.forEach(k => {
+        kitapSelect.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+}
+
+// SAYFA İLK AÇILIŞINDA YÜKLE
 mufredatGuncelle();
 
 // MENU VE SAYFA GEÇİŞLERİ
@@ -1058,7 +1168,7 @@ function tahtayiCiz() {
                     <button class="btn-del" onclick="gorevSil(${item.id}, event)">×</button>
                     <span class="tag">${item.seviye} ${item.ders}</span>
                     <span class="kat-tag">${item.kategori}</span><br>
-                    <b>${item.kaynak} ${item.hoca ? ' (' + item.hoca + ')' : ''}</b><br>
+                    <b>${item.yayin ? item.yayin + ' - ' : ''}${item.kaynak} ${item.hoca ? ' (' + item.hoca + ')' : ''}</b><br>
                     <span>${item.konu}</span><br>
                     <div style="margin-top: 4px;"><b>${item.toplam} ${birimAdi}</b> (~${dk} dk)</div>
                     <div style="margin-top: 4px; font-weight: bold;">İlerleme: ${item.tamamlanan || 0} / ${item.toplam}</div>
@@ -1084,7 +1194,8 @@ function gorevEkle() {
     const ders = document.getElementById('dersSelect').value;
     const konu = document.getElementById('konuSelect').value;
     const hoca = document.getElementById('hocaSelect').value;
-    const kaynak = document.getElementById('kaynak').value || "Kaynak/Soru Bankası";
+    const yayin = document.getElementById('yayinSelect').value;
+    const kaynak = document.getElementById('kitapSelect').value || "Özel Kaynak";
     const toplamBirim = parseInt(document.getElementById('toplamBirim').value);
     const birimSüre = parseInt(document.getElementById('birimSüre').value) || 15;
     const ytUrl = document.getElementById('ytUrl').value;
@@ -1103,7 +1214,7 @@ function gorevEkle() {
         if (eklenecek > 0) {
             localProgramData.push({
                 id: Date.now() + Math.random(),
-                seviye, kategori, ders, kaynak, hoca, konu,
+                seviye, kategori, ders, yayin, kaynak, hoca, konu,
                 toplam: eklenecek, sure: birimSüre, tamamlanan: 0, ytUrl, gun
             });
         }
