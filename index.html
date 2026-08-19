@@ -72,7 +72,7 @@
         .btn-timer-action { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         /* FORM VE TAHTA STİLLERİ */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; background: var(--form-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; background: var(--form-bg); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
         select, input, textarea { padding: 10px; border: 1px solid #ffd8d8; border-radius: 8px; font-size: 13px; outline: none; background: var(--card-color); color: var(--text-color); }
         
         .days-checkboxes { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; background: var(--card-color); padding: 10px; border-radius: 8px; border: 1px solid #ffe1e1; align-items: center; }
@@ -127,7 +127,7 @@
 </head>
 <body>
 
-<!-- YAN MENÜ PANETELİ -->
+<!-- YAN MENÜ PANELİ -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -168,7 +168,7 @@
     <!-- 1. SEKME: ANA SAYFA & HAFTALIK TAHTA -->
     <div id="anaSayfa" class="page-section active">
         <div class="form-grid">
-            <select id="seviye">
+            <select id="seviye" onchange="mufredatGuncelle()">
                 <option value="TYT">TYT</option>
                 <option value="AYT">AYT</option>
             </select>
@@ -181,13 +181,23 @@
                 <option value="Deneme">📝 Deneme</option>
             </select>
 
-            <input type="text" id="ders" placeholder="Ders Adı (ör: Matematik)">
-            <input type="text" id="kaynak" placeholder="Kaynak / Kanal (ör: 345, Aker Hoca)">
-            <input type="text" id="konu" placeholder="Konu / Kamp (ör: Dil Bilgisi)">
-            
+            <!-- DERS - KONU - HOCA SEÇİM ALANLARI -->
+            <select id="dersSelect" onchange="konulariYukle()">
+                <!-- JS İLE DOLACAK -->
+            </select>
+
+            <select id="konuSelect">
+                <!-- JS İLE DOLACAK -->
+            </select>
+
+            <select id="hocaSelect">
+                <!-- JS İLE DOLACAK -->
+            </select>
+
+            <input type="text" id="kaynak" placeholder="Kaynak Adı (ör: 345, Bilgi Sarmal)">
             <input type="number" id="toplamBirim" placeholder="Test / Video Sayısı" min="1">
             <input type="number" id="birimSüre" placeholder="1 Test/Video Kaç Dk?" value="15" min="1">
-            <input type="text" id="ytUrl" placeholder="YouTube Playlist Linki (Opsiyonel)">
+            <input type="text" id="ytUrl" placeholder="YouTube Linki (Opsiyonel)">
             
             <div class="days-checkboxes">
                 <span style="font-size: 13px; font-weight: bold; color: var(--accent);">Dağıtılacak Günler:</span>
@@ -476,6 +486,141 @@ const db = firebase.database();
 const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 let aktifProfil = 'ben';
 let localProgramData = [];
+
+// MÜFREDAT VE HOCA VERİ TABANI (PDF VERİLERİ)
+const mufredatData = {
+    TYT: {
+        "Türkçe": [
+            "Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Anlatım Biçimleri", "Ses Bilgisi", 
+            "Yazım Kuralları", "Noktalama İşaretleri", "Sözcükte Yapı", "Sözcük Türleri", "Edat-Bağlaç-Ünlem", 
+            "Fiil-Ek Fiil", "Fiilimsi", "Fiilde Çatı", "Cümlenin Öğeleri", "Cümle Türleri", "Anlatım Bozuklukları", "Deyim ve Atasözü"
+        ],
+        "Matematik": [
+            "Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB-EKOK", "Rasyonel Sayılar-Ondalık Sayılar", 
+            "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", 
+            "Denklem Çözme", "Problemler", "Kümeler-Kartezyen Çarpımı", "Fonksiyonlar", "Permütasyon", "Kombinasyon", 
+            "Binom", "Olasılık", "İstatistik", "2. Dereceden Denklemler", "Karmaşık Sayılar", "Polinomlar", "Mantık", "Veri Analizi"
+        ],
+        "Geometri": [
+            "Doğruda ve Üçgende Açılar", "Üçgende Açı-Kenar Bağıntıları", "Üçgende Benzerlik", "Üçgende Açıortay-Kenarortay", 
+            "Dik Üçgen", "İkizkenar Üçgen", "Eşkenar Üçgen", "Üçgende Alan", "Çokgenler", "Dörtgenler", "Yamuk-Paralelkenar", 
+            "Eşkenar Dörtgen", "Dikdörtgen", "Kare", "Deltoid", "Çemberde Açı", "Çemberde Uzunluk", "Dairenin Çevresi ve Alanı", 
+            "Doğrunun Analitik İncelenmesi", "Çemberin Analitik İncelenmesi", "Katı Cisimler (Prizma, Küp, Piramit, Silindir, Koni, Küre)"
+        ],
+        "Fizik": [
+            "Fizik Bilimine Giriş", "Madde ve Özellikleri", "Kuvvet ve Hareket", "İş, Güç ve Enerji", "Isı, Sıcaklık ve Genleşme", 
+            "Basınç", "Kaldırma Kuvveti", "Elektrik ve Manyetizma", "Dalgalar", "Optik"
+        ],
+        "Kimya": [
+            "Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Halleri", "Doğa ve Kimya", 
+            "Kimyanın Temel Kanunları ve Kimyasal Hesaplamalar", "Karışımlar", "Asitler-Bazlar ve Tuzlar", "Kimya Her Yerde"
+        ],
+        "Biyoloji": [
+            "Yaşam Bilimi Biyoloji", "Hücre", "Canlılar Dünyası", "Hücre Bölünmeleri ve Üreme", "Kalıtımın Genel İlkeleri", 
+            "Ekosistem Ekolojisi ve Güncel Çevre Sorunları"
+        ],
+        "Tarih": [
+            "Tarih Bilimine Giriş", "Uygarlığın Doğuşu ve İlk Uygarlıklar", "İlk Türk Devletleri", "İslam Tarihi ve Uygarlığı", 
+            "Türk-İslam Devletleri", "Türklerin İslamiyeti Kabulü", "Türkiye Tarihi", "Beylikten Devlete (1300-1453)", 
+            "Dünya Gücü: Osmanlı Devleti", "Osmanlı Duraklama Dönemi", "Gerileme Devri (1699-1792)", "Arayış Yılları (17. Yüzyıl)", 
+            "Avrupa ve Osmanlı Devleti (18. Yüzyıl)", "En Uzun Yüzyıl (1800-1922)", "20. Yüzyıl Başlarında Osmanlı Devleti", 
+            "1. Dünya Savaşı - Milli Mücadeleye Hazırlık", "Kurtuluş Savaşında Cepheler", "Türk İnkılabı", "Atatürkçülük ve İlkeleri", "Türk Dış Politikası"
+        ],
+        "Coğrafya": [
+            "İnsan ve Doğa", "Dünyanın Şekli ve Hareketleri", "Coğrafi Konum", "Harita Bilgisi", "Atmosfer ve Sıcaklık", "İklimler", 
+            "Basınç ve Rüzgarlar", "Nem, Yağış ve Buharlaşma", "İç Kuvvetler / Dış Kuvvetler", "Su-Toprak ve Bitkiler", 
+            "Nüfus-Göç-Yerleşme", "Türkiye'nin Yer Şekilleri", "Ekonomik Faaliyetler", "Bölgeler ve Ülkeler", "Uluslararası Ulaşım Hatları", "Çevre ve Toplum", "Doğal Afetler"
+        ],
+        "Felsefe": [
+            "Felsefenin Alanı", "Bilgi Felsefesi", "Bilim Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Siyaset Felsefesi", "Sanat Felsefesi", "Din Felsefesi"
+        ],
+        "Din Kültürü": [
+            "İnsan ve Din (İnanç)", "İbadet", "Hz. Muhammed'in Hayatı", "Vahiy ve Akıl", "İslam Düşüncesi ve Yorumu", "İslamda Değerler, Sanat ve Laiklik", "Yaşayan Dinler"
+        ]
+    },
+    AYT: {
+        "Matematik": [
+            "Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB-EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", 
+            "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Denklem Çözme", "Problemler", 
+            "Kümeler", "Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "2.Dereceden Denklemler", "Permütasyon ve Kombinasyon", 
+            "Binom ve Olasılık", "İstatistik", "Karmaşık Sayılar", "2.Dereceden Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"
+        ],
+        "Geometri": [
+            "Doğruda ve Üçgende Açılar", "Dik ve Özel Üçgenler", "Dik Üçgende Trigonometrik Bağıntılar", "İkizkenar ve Eşkenar Üçgen", 
+            "Üçgende Alanlar", "Üçgende Açıortay Bağıntıları", "Üçgende Kenarortay Bağıntıları", "Üçgende Eşlik ve Benzerlik", 
+            "Üçgende Açı-Kenar Bağıntıları", "Çokgenler", "Dörtgenler", "Yamuk", "Paralelkenar", "Eşkenar Dörtgen - Deltoid", "Dikdörtgen", 
+            "Çemberde Açılar", "Çemberde Uzunluk", "Daire", "Prizmalar", "Piramitler", "Küre", "Koordinat Düzlemi ve Noktanın Analitiği", 
+            "Doğrunun Analitiği", "Tekrar Eden, Dönen ve Yansıyan Şekiller", "Dönüşümlerle Geometri", "Trigonometri", "Çemberin Analitiği"
+        ],
+        "Fizik": [
+            "Vektörler", "Kuvvet, Tork ve Denge", "Kütle Merkezi", "Basit Makineler", "Hareket", "Newton'un Hareket Yasaları", 
+            "İş, Güç ve Enerji I", "Atışlar", "İtme ve Momentum", "Elektrik Alan ve Potansiyel", "Paralel Levhalar ve Sığa", 
+            "Manyetik Alan ve Manyetik Kuvvet", "İndüksiyon, Alternatif Akım ve Transformatörler", "Çembersel Hareket", 
+            "Kütle Çekim ve Kepler Yasaları", "Basit Harmonik Hareket", "Dalga Mekaniği ve Elektromanyetik Dalgalar", "Atom Modelleri", 
+            "Büyük Patlama ve Radyoaktivite", "Modern Fizik", "Modern Fiziğin Teknolojideki Uygulamaları"
+        ],
+        "Kimya": [
+            "Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler ve Çözünürlük", "Kimyasal Tepkimelerde Enerji", "Tepkimelerde Hız ve Denge", 
+            "Kimya ve Elektrik", "Karbon Kimyası", "Organik Kimya", "Enerji Kaynakları ve Bilimsel Gelişmeler"
+        ],
+        "Biyoloji": [
+            "Sinir Sistemi", "Endokrin Sistem", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", 
+            "Dolaşım ve Bağışıklık Sistemi", "Solunum Sistemi", "Üriner Sistem", "Üreme Sistemi ve Embriyonik Gelişim", 
+            "Komünite ve Popülasyon Ekolojisi", "Nükleik Asitler", "Genetik Şifre ve Protein Sentezi", "Canlılık ve Enerji", 
+            "Fotosentez ve Kemosentez", "Hücresel Solunum", "Bitki Biyolojisi", "Canlılar ve Çevre"
+        ]
+    }
+};
+
+const hocaData = {
+    "Matematik": ["Mert Hoca 📐", "Eyüp B. 🧠", "Rehber Matematik 🚀", "Bıyıklı Matematik 👨🏻‍🌾", "Tunç Kurt ✏️", "Laptü Matematik 🎯", "Kendi Çözümüm / Diğer"],
+    "Geometri": ["Kenan Kara 📐", "Eyüp B. 🧠", "Mert Hoca 📏", "Kendi Çözümüm / Diğer"],
+    "Fizik": ["Özcan Aykın ⚡", "VIP Fizik 🚀", "Fizikle Barış 🧲", "Altuğ Güneş 💡", "Kendi Çözümüm / Diğer"],
+    "Kimya": ["Ferrum 🧪", "Görkem Şahin 🔬", "Kimyasal Gelişmeler 👨‍🔬", "Mesut Hoca 🧬", "Kendi Çözümüm / Diğer"],
+    "Biyoloji": ["Betül Biyoloji 🌿", "Dr. Biyoloji 🧬", "Selin Hoca 🍃", "Biosem 🔬", "Kendi Çözümüm / Diğer"],
+    "Türkçe": ["Aker Kartal 📚", "Rüştü Hoca 📖", "Kadir Gümüş ✍️", "Kendi Çözümüm / Diğer"],
+    "Tarih": ["Ramazan Yetgin 📜", "Saddet Hoca 🏛️", "Aydın Yüce 🏹", "Kendi Çözümüm / Diğer"],
+    "Coğrafya": ["Yunus Hoca 🌍", "Coğrafyanın Kodları 🗺️", "Engin Eraydın 🏔️", "Kendi Çözümüm / Diğer"],
+    "Felsefe": ["Canan Hoca 💭", "Felsefe Atölyesi 🧠", "Kendi Çözümüm / Diğer"],
+    "Din Kültürü": ["Rüştü Hoca 📖", "Kendi Çözümüm / Diğer"]
+};
+
+// DERS - KONU - HOCA SEÇİM DİNAMİK YÜKLEME
+function mufredatGuncelle() {
+    const seviye = document.getElementById('seviye').value;
+    const dersSelect = document.getElementById('dersSelect');
+    dersSelect.innerHTML = '';
+
+    const dersler = Object.keys(mufredatData[seviye]);
+    dersler.forEach(d => {
+        dersSelect.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+
+    konulariYukle();
+}
+
+function konulariYukle() {
+    const seviye = document.getElementById('seviye').value;
+    const ders = document.getElementById('dersSelect').value;
+    const konuSelect = document.getElementById('konuSelect');
+    const hocaSelect = document.getElementById('hocaSelect');
+    
+    konuSelect.innerHTML = '';
+    hocaSelect.innerHTML = '';
+
+    const konular = mufredatData[seviye][ders] || ["Genel Konu"];
+    konular.forEach(k => {
+        konuSelect.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+
+    const hocalar = hocaData[ders] || ["YouTube Kanalı / Hoca Seç", "Kendi Çözümüm / Diğer"];
+    hocalar.forEach(h => {
+        hocaSelect.innerHTML += `<option value="${h}">${h}</option>`;
+    });
+}
+
+// SAYFA İLK AÇILIŞINDA MÜFREDATI YÜKLE
+mufredatGuncelle();
 
 // MENU VE SAYFA GEÇİŞLERİ
 function toggleSidebar() {
@@ -913,7 +1058,7 @@ function tahtayiCiz() {
                     <button class="btn-del" onclick="gorevSil(${item.id}, event)">×</button>
                     <span class="tag">${item.seviye} ${item.ders}</span>
                     <span class="kat-tag">${item.kategori}</span><br>
-                    <b>${item.kaynak}</b><br>
+                    <b>${item.kaynak} ${item.hoca ? ' (' + item.hoca + ')' : ''}</b><br>
                     <span>${item.konu}</span><br>
                     <div style="margin-top: 4px;"><b>${item.toplam} ${birimAdi}</b> (~${dk} dk)</div>
                     <div style="margin-top: 4px; font-weight: bold;">İlerleme: ${item.tamamlanan || 0} / ${item.toplam}</div>
@@ -936,9 +1081,10 @@ function tahtayiCiz() {
 function gorevEkle() {
     const seviye = document.getElementById('seviye').value;
     const kategori = document.getElementById('kategori').value;
-    const ders = document.getElementById('ders').value || "Genel Ders";
-    const kaynak = document.getElementById('kaynak').value || "Kaynak";
-    const konu = document.getElementById('konu').value || "Genel Konu";
+    const ders = document.getElementById('dersSelect').value;
+    const konu = document.getElementById('konuSelect').value;
+    const hoca = document.getElementById('hocaSelect').value;
+    const kaynak = document.getElementById('kaynak').value || "Kaynak/Soru Bankası";
     const toplamBirim = parseInt(document.getElementById('toplamBirim').value);
     const birimSüre = parseInt(document.getElementById('birimSüre').value) || 15;
     const ytUrl = document.getElementById('ytUrl').value;
@@ -957,7 +1103,7 @@ function gorevEkle() {
         if (eklenecek > 0) {
             localProgramData.push({
                 id: Date.now() + Math.random(),
-                seviye, kategori, ders, kaynak, konu,
+                seviye, kategori, ders, kaynak, hoca, konu,
                 toplam: eklenecek, sure: birimSüre, tamamlanan: 0, ytUrl, gun
             });
         }
