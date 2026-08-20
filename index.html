@@ -111,10 +111,12 @@
         .quiz-option.correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
         .quiz-option.wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
 
-        /* AYLIK/YILLIK PLAN STİLLERİ */
-        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 15px; }
-        .plan-box { background: var(--card-color); border: 2px solid var(--header-border); padding: 15px; border-radius: 10px; position: relative; }
-        .plan-box h4 { color: var(--accent); margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid var(--form-bg); padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        /* AYLIK/YILLIK KARE ÇİZELGE PLAN STİLLERİ */
+        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
+        .plan-box { background: var(--card-color); border: 2px solid var(--header-border); padding: 15px; border-radius: 12px; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.03); min-height: 180px; }
+        .plan-box h4 { color: var(--accent); margin-top: 0; margin-bottom: 10px; border-bottom: 2px dashed var(--form-bg); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
+        .plan-konu-item { background: var(--form-bg); padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; border-left: 3px solid var(--accent); }
+        .plan-konu-item.completed { text-decoration: line-through; opacity: 0.6; border-left-color: #2ecc71; }
 
         /* HATA DEFTERİ VE MEB KÖŞESİ STİLLERİ */
         .canvas-container { position: relative; width: 100%; max-width: 500px; margin: 10px auto; border: 2px dashed var(--accent); border-radius: 10px; overflow: hidden; background: #fff; }
@@ -136,7 +138,7 @@
     </div>
     <div class="sidebar-menu">
         <button class="menu-item active" onclick="sayfaDegistir('anaSayfa')">🏠 Programım & Tahta</button>
-        <button class="menu-item" onclick="sayfaDegistir('planlamaSayfasi')">📅 Aylık & Yıllık Planlama</button>
+        <button class="menu-item" onclick="sayfaDegistir('planlamaSayfasi')">📅 Aylık Konu Çizelgesi</button>
         <button class="menu-item" onclick="sayfaDegistir('yksRehberSayfasi')">🎯 YKS Rehberi & Mini Test</button>
         <button class="menu-item" onclick="sayfaDegistir('yksHedefSayfasi')">🎓 YKS 2027 & Hedefler</button>
         <button class="menu-item" onclick="sayfaDegistir('mebSayfasi')">📖 MEB & ÖSYM Özel Köşesi</button>
@@ -230,14 +232,14 @@
         <div class="weekly-board" id="haftalikTahta"></div>
     </div>
 
-    <!-- 2. SEKME: AYLARA GÖRE DERS & KONU PLANLAMA -->
+    <!-- 2. SEKME: AYLIK DERS & KONU ÇİZELGESİ (KARE KARTLAR) -->
     <div id="planlamaSayfasi" class="page-section">
         <div class="feature-card">
-            <h3>📅 Aylara Göre Çalışma & Konu Planlaması</h3>
-            <p style="font-size: 12px; color: #666;">İstediğin ayı listeden seçip o ay bitirmek istediğin ders, konu ve kampları planla aşkım!</p>
+            <h3>📅 Aylara Göre Müfredat & Konu Çizelgesi</h3>
+            <p style="font-size: 12px; color: #666;">Müfredat konularını aylara bölüp kare kartlar şeklinde takip edebilirsin aşkım!</p>
             
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-                <select id="planAySelect" style="width: 25%; font-weight: bold; color: var(--accent);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                <select id="planAySelect" style="font-weight: bold; color: var(--accent);">
                     <option value="Ocak ❄️">Ocak ❄️</option>
                     <option value="Şubat ❄️">Şubat ❄️</option>
                     <option value="Mart 🌸">Mart 🌸</option>
@@ -251,11 +253,26 @@
                     <option value="Kasım 🍂">Kasım 🍂</option>
                     <option value="Aralık ❄️">Aralık ❄️</option>
                 </select>
-                
-                <input type="text" id="planDetayInput" placeholder="Aya özel hedefler (ör: TYT Matematik Bitiş + Türkçe Paragraf)" style="flex: 1;">
-                <button class="btn-add" style="width: auto; padding: 0 20px;" onclick="aylikPlanEkle()">Aya Plan Ekle 📌</button>
+
+                <select id="planSeviyeSelect" onchange="planMufredatGuncelle()">
+                    <option value="TYT">TYT</option>
+                    <option value="AYT">AYT</option>
+                </select>
+
+                <select id="planDersSelect" onchange="planKonulariYukle()">
+                    <!-- Dynamic -->
+                </select>
+
+                <select id="planKonuSelect">
+                    <!-- Dynamic -->
+                </select>
+
+                <input type="number" id="planGunInput" placeholder="Hedef Süre (Gün)" min="1" value="7">
+
+                <button class="btn-add" style="grid-column: 1 / -1; margin-top: 5px;" onclick="aylikPlanEkle()">Konuyu Aya Ekle 📌</button>
             </div>
 
+            <!-- KARE ÇİZELGE ALANI -->
             <div id="aylikPlanListesi" class="plan-grid"></div>
         </div>
     </div>
@@ -492,6 +509,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const gunler = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+const aylarListesi = ["Ocak ❄️", "Şubat ❄️", "Mart 🌸", "Nisan 🌸", "Mayıs 🌸", "Haziran ☀️", "Temmuz ☀️", "Ağustos ☀️", "Eylül 🍂", "Ekim 🍂", "Kasım 🍂", "Aralık ❄️"];
 let aktifProfil = 'ben';
 let localProgramData = [];
 
@@ -667,7 +685,7 @@ const hocaData = {
     "Din Kültürü": ["Rüştü Hoca 📖", "Kendi Çözümüm / Diğer"]
 };
 
-// DERS - KONU - HOCA SEÇİM DİNAMİK YÜKLEME
+// DERS - KONU - HOCA SEÇİM DİNAMİK YÜKLEME (HAFTALIK PROGRAM DAHİL)
 function mufredatGuncelle() {
     const seviye = document.getElementById('seviye').value;
     const dersSelect = document.getElementById('dersSelect');
@@ -729,8 +747,35 @@ function kitaplariYukle() {
     });
 }
 
+// AYLIK PLANLAMA SEKME DİNAMİK DROPDOWNLARI
+function planMufredatGuncelle() {
+    const seviye = document.getElementById('planSeviyeSelect').value;
+    const dersSelect = document.getElementById('planDersSelect');
+    dersSelect.innerHTML = '';
+
+    const dersler = Object.keys(mufredatData[seviye]);
+    dersler.forEach(d => {
+        dersSelect.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+
+    planKonulariYukle();
+}
+
+function planKonulariYukle() {
+    const seviye = document.getElementById('planSeviyeSelect').value;
+    const ders = document.getElementById('planDersSelect').value;
+    const konuSelect = document.getElementById('planKonuSelect');
+    
+    konuSelect.innerHTML = '';
+    const konular = mufredatData[seviye][ders] || ["Genel Konu"];
+    konular.forEach(k => {
+        konuSelect.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+}
+
 // SAYFA İLK AÇILIŞINDA YÜKLE
 mufredatGuncelle();
+planMufredatGuncelle();
 
 // MENU VE SAYFA GEÇİŞLERİ
 function toggleSidebar() {
@@ -881,39 +926,73 @@ db.ref('sorular/' + aktifProfil).on('value', (snap) => {
     }
 });
 
-// AYLARA GÖRE PLANLAMA MANTIĞI
+// AYLARA GÖRE KARE KARTLAR DERS/KONU PLANLAMA MANTIĞI
 function aylikPlanEkle() {
     const ay = document.getElementById('planAySelect').value;
-    const detay = document.getElementById('planDetayInput').value;
-    if(!ay || !detay) {
-        alert("Lütfen plan detayını girin aşkım!");
+    const seviye = document.getElementById('planSeviyeSelect').value;
+    const ders = document.getElementById('planDersSelect').value;
+    const konu = document.getElementById('planKonuSelect').value;
+    const gun = document.getElementById('planGunInput').value || "7";
+
+    if(!ay || !ders || !konu) {
+        alert("Lütfen ders ve konu bilgilerini eksiksiz seç aşkım!");
         return;
     }
 
-    db.ref('aylikPlanlar/' + aktifProfil).push({ ay, detay });
-    document.getElementById('planDetayInput').value = '';
+    db.ref('aylikPlanlar/' + aktifProfil).push({ 
+        ay, seviye, ders, konu, gun, tamamlandi: false 
+    });
 }
 
 function aylikPlanSil(id) {
     db.ref('aylikPlanlar/' + aktifProfil + '/' + id).remove();
 }
 
+function aylikPlanDurumToggle(id, mevcutDurum) {
+    db.ref('aylikPlanlar/' + aktifProfil + '/' + id).update({ tamamlandi: !mevcutDurum });
+}
+
 db.ref('aylikPlanlar/' + aktifProfil).on('value', (snap) => {
     const list = document.getElementById('aylikPlanListesi');
     list.innerHTML = '';
-    const data = snap.val();
-    if(data) {
-        Object.keys(data).reverse().forEach(k => {
-            const item = data[k];
-            list.innerHTML += `<div class="plan-box">
+    const data = snap.val() || {};
+
+    // Aylara göre gruplama yaparak kare çizelge halinde gösterelim
+    aylarListesi.forEach(ayAdi => {
+        const ayaAitKonular = Object.keys(data).filter(k => data[k].ay === ayAdi);
+
+        let html = `
+            <div class="plan-box">
                 <h4>
-                    <span>${item.ay}</span>
-                    <button onclick="aylikPlanSil('${k}')" style="background:none; border:none; color:#d63031; cursor:pointer; font-size:14px;">✕</button>
+                    <span>${ayAdi}</span>
+                    <span style="font-size:11px; font-weight:normal; background:var(--form-bg); padding:2px 8px; border-radius:10px; color:var(--accent);">
+                        ${ayaAitKonular.length} Konu
+                    </span>
                 </h4>
-                <p style="font-size:13px; margin:0; white-space: pre-wrap;">${item.detay}</p>
-            </div>`;
-        });
-    }
+                <div style="display:flex; flex-direction:column; gap:6px;">
+        `;
+
+        if (ayaAitKonular.length === 0) {
+            html += `<p style="font-size:11px; color:#aaa; font-style:italic; text-align:center; margin-top:20px;">Bu ay için henüz konu eklenmedi 💕</p>`;
+        } else {
+            ayaAitKonular.forEach(key => {
+                const item = data[key];
+                const isComp = item.tamamlandi;
+                html += `
+                    <div class="plan-konu-item ${isComp ? 'completed' : ''}">
+                        <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                            <input type="checkbox" ${isComp ? 'checked' : ''} onchange="aylikPlanDurumToggle('${key}', ${isComp})">
+                            <span><b>[${item.seviye} ${item.ders}]</b> ${item.konu} <small style="color:#888;">(~${item.gun} gün)</small></span>
+                        </div>
+                        <button onclick="aylikPlanSil('${key}')" style="background:none; border:none; color:#b2bec3; cursor:pointer; font-weight:bold; font-size:12px;">✕</button>
+                    </div>
+                `;
+            });
+        }
+
+        html += `</div></div>`;
+        list.innerHTML += html;
+    });
 });
 
 // MİNİ TEST & QUIZ SİSTEMİ
