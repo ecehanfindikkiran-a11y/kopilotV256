@@ -115,12 +115,15 @@
         .months-list { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
         .month-card { background: var(--card-color); border: 2px solid var(--header-border); border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
         .month-header { color: var(--accent); font-size: 16px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid var(--form-bg); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-        .month-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .month-input-group input { flex: 1; }
-        .month-input-group button { background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; white-space: nowrap; }
+        
+        .month-input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; background: var(--form-bg); padding: 10px; border-radius: 8px; }
+        .month-input-grid button { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
+        
         .month-items-list { display: flex; flex-direction: column; gap: 6px; }
-        .month-item { background: var(--form-bg); padding: 8px 12px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--accent); }
-        .month-item-del { background: none; border: none; color: #d63031; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .month-item { background: var(--form-bg); padding: 10px 12px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
+        .month-item-del { background: none; border: none; color: #d63031; cursor: pointer; font-weight: bold; font-size: 16px; margin-left: 10px; }
+        .month-item-tag { display: inline-block; background: #fff0f3; color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; margin-right: 6px; }
+        .month-item-duration { display: inline-block; background: #eccc68; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; margin-left: 6px; }
 
         /* HATA DEFTERİ VE MEB KÖŞESİ STİLLERİ */
         .canvas-container { position: relative; width: 100%; max-width: 500px; margin: 10px auto; border: 2px dashed var(--accent); border-radius: 10px; overflow: hidden; background: #fff; }
@@ -236,11 +239,11 @@
         <div class="weekly-board" id="haftalikTahta"></div>
     </div>
 
-    <!-- 2. SEKME: AYLARA GÖRE DERS & KONU PLANLAMA (YENİLENMİŞ ALT ALTA LİSTE) -->
+    <!-- 2. SEKME: AYLARA GÖRE DERS & KONU PLANLAMA (GÜNCELLENMİŞ ALT ALTA DETAYLI SEÇİM) -->
     <div id="planlamaSayfasi" class="page-section">
         <div class="feature-card">
             <h3>📅 Aylara Göre Çalışma & Konu Planlaması</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom:15px;">Her ayın altına o ay bitirmek istediğin ders, konu ve hedeflerini ekleyebilirsin aşkım!</p>
+            <p style="font-size: 12px; color: #666; margin-bottom:15px;">Her ay için TYT/AYT seçip ders, konu ve kaç günde biteceğini ekleyebilirsin aşkım!</p>
             
             <div id="aylikPlanlarContainer" class="months-list">
                 <!-- JS İLE 12 AY ALT ALTA OTOMATİK OLUŞACAK -->
@@ -874,19 +877,61 @@ db.ref('sorular/' + aktifProfil).on('value', (snap) => {
     }
 });
 
-// AYLARA GÖRE PLANLAMA MANTIĞI (ALT ALTA YENİDEN TASARLANDI)
+// AYLARA GÖRE PLANLAMA MANTIĞI (DETAYLI SEÇİMLİ YENİ DÜZEN)
+function aylikTurGuncelle(safeAyId) {
+    const turEl = document.getElementById(`aylikTur_${safeAyId}`);
+    const dersEl = document.getElementById(`aylikDers_${safeAyId}`);
+    if(!turEl || !dersEl) return;
+
+    const secilenTur = turEl.value;
+    dersEl.innerHTML = '';
+    
+    const dersler = Object.keys(mufredatData[secilenTur]);
+    dersler.forEach(d => {
+        dersEl.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+
+    aylikKonuGuncelle(safeAyId);
+}
+
+function aylikKonuGuncelle(safeAyId) {
+    const turEl = document.getElementById(`aylikTur_${safeAyId}`);
+    const dersEl = document.getElementById(`aylikDers_${safeAyId}`);
+    const konuEl = document.getElementById(`aylikKonu_${safeAyId}`);
+    if(!turEl || !dersEl || !konuEl) return;
+
+    const secilenTur = turEl.value;
+    const secilenDers = dersEl.value;
+    konuEl.innerHTML = '';
+
+    const konular = mufredatData[secilenTur][secilenDers] || ["Genel Konu"];
+    konular.forEach(k => {
+        konuEl.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+}
+
 function aylikPlanEkle(ayAdi) {
     const safeAyId = ayAdi.replace(/[^a-zA-Z0-9]/g, "_");
-    const inputEl = document.getElementById(`planInput_${safeAyId}`);
-    const detay = inputEl ? inputEl.value.trim() : "";
+    
+    const tur = document.getElementById(`aylikTur_${safeAyId}`).value;
+    const ders = document.getElementById(`aylikDers_${safeAyId}`).value;
+    const konu = document.getElementById(`aylikKonu_${safeAyId}`).value;
+    const gunSayisi = document.getElementById(`aylikGun_${safeAyId}`).value;
 
-    if(!detay) {
-        alert("Lütfen bir hedef veya konu detay yaz aşkım!");
+    if(!gunSayisi || gunSayisi < 1) {
+        alert("Lütfen kaç günde biteceğini belirt aşkım!");
         return;
     }
 
-    db.ref('aylikPlanlar/' + aktifProfil).push({ ay: ayAdi, detay });
-    inputEl.value = '';
+    db.ref('aylikPlanlar/' + aktifProfil).push({
+        ay: ayAdi,
+        tur,
+        ders,
+        konu,
+        gunSayisi: parseInt(gunSayisi)
+    });
+
+    document.getElementById(`aylikGun_${safeAyId}`).value = '';
 }
 
 function aylikPlanSil(id) {
@@ -904,9 +949,14 @@ function aylikPlanlariCiz(data) {
         if (data) {
             Object.keys(data).forEach(k => {
                 if (data[k].ay === ay) {
+                    const item = data[k];
                     itemsHtml += `
                         <div class="month-item">
-                            <span>📌 ${data[k].detay}</span>
+                            <div>
+                                <span class="month-item-tag">${item.tur || 'TYT'}</span>
+                                <b>${item.ders}:</b> ${item.konu}
+                                <span class="month-item-duration">⏳ ${item.gunSayisi} Günde Bitiş</span>
+                            </div>
                             <button class="month-item-del" onclick="aylikPlanSil('${k}')">✕</button>
                         </div>
                     `;
@@ -917,15 +967,35 @@ function aylikPlanlariCiz(data) {
         container.innerHTML += `
             <div class="month-card">
                 <div class="month-header">${ay}</div>
-                <div class="month-input-group">
-                    <input type="text" id="planInput_${safeAyId}" placeholder="Bu ay için hedef/konu ekle..." onkeypress="if(event.key==='Enter') aylikPlanEkle('${ay}')">
-                    <button onclick="aylikPlanEkle('${ay}')">+ Ekle</button>
+                <div class="month-input-grid">
+                    <select id="aylikTur_${safeAyId}" onchange="aylikTurGuncelle('${safeAyId}')">
+                        <option value="TYT">TYT</option>
+                        <option value="AYT">AYT</option>
+                    </select>
+
+                    <select id="aylikDers_${safeAyId}" onchange="aylikKonuGuncelle('${safeAyId}')">
+                        <!-- JS DOLDURACAK -->
+                    </select>
+
+                    <select id="aylikKonu_${safeAyId}">
+                        <!-- JS DOLDURACAK -->
+                    </select>
+
+                    <input type="number" id="aylikGun_${safeAyId}" placeholder="Kaç Günde Bitecek?" min="1">
+
+                    <button onclick="aylikPlanEkle('${ay}')">+ Konu Ekle</button>
                 </div>
                 <div class="month-items-list">
                     ${itemsHtml || '<span style="font-size:12px; color:#aaa; font-style:italic;">Henüz bu aya özel bir plan eklenmedi.</span>'}
                 </div>
             </div>
         `;
+    });
+
+    // Her ay için dinamik select listelerini başlat
+    aylar.forEach(ay => {
+        const safeAyId = ay.replace(/[^a-zA-Z0-9]/g, "_");
+        aylikTurGuncelle(safeAyId);
     });
 }
 
@@ -1092,7 +1162,7 @@ function netEkle() {
     const tur = document.getElementById('netTür').value;
     const turkce = parseFloat(document.getElementById('netTurkce').value) || 0;
     const mat = parseFloat(document.getElementById('netMat').value) || 0;
-    const sos = parseFloat(document.getElementById('netSos`/').value) || 0;
+    const sos = parseFloat(document.getElementById('netSos').value) || 0;
     const fen = parseFloat(document.getElementById('netFen').value) || 0;
     const toplam = turkce + mat + sos + fen;
 
